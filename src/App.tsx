@@ -6,7 +6,7 @@ import { ModalPago } from "./components/ModalPago";
 import { Footer } from "./components/Footer";
 import { googleSheetsService } from "./services/googleSheets";
 import { InscripcionData } from "./config/campamento";
-import { Toaster, toast } from "sonner@2.0.3";
+import { Toaster, toast } from "sonner";
 
 export default function App() {
   const [modalPagoOpen, setModalPagoOpen] = useState(false);

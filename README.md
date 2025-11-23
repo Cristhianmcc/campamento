@@ -1,11 +1,59 @@
+# Landing Page - Campamento Cristiano
 
-  # Landing Page Campamento Cristiano
+Sistema de inscripciones para campamentos cristianos con integración a Google Sheets y WhatsApp.
 
-  This is a code bundle for Landing Page Campamento Cristiano. The original project is available at https://www.figma.com/design/7ht5oe11DSdT5xGoPVAtyG/Landing-Page-Campamento-Cristiano.
+## Características
 
-  ## Running the code
+- Formulario de inscripción con validación
+- Integración con Google Sheets para almacenar inscripciones
+- Sistema de verificación de DNI duplicado
+- Envío automático de comprobantes por WhatsApp
+- Sistema de estados: Pendientes y Confirmadas
+- Diseño responsive para móviles, tablets y desktop
+- Métodos de pago: YAPE y PLIN
 
-  Run `npm i` to install the dependencies.
+## Instalación Local
 
-  Run `npm run dev` to start the development server.
-  
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
+npm run dev
+
+# Build para producción
+npm run build
+```
+
+## Configuración
+
+### 1. Google Sheets
+Sigue la guía en `GUIA_API_GOOGLE_SHEETS.md` para:
+- Obtener tu API Key de Google
+- Crear y configurar tu Google Sheet
+
+### 2. Configurar el Proyecto
+Edita `src/config/campamento.ts` con tus datos
+
+## Deployment en Netlify
+
+### Deploy desde GitHub
+
+1. Sube tu proyecto a GitHub
+2. Ve a [Netlify](https://app.netlify.com)
+3. Importa tu repositorio
+4. Netlify detectará automáticamente la configuración
+5. Haz clic en "Deploy"
+
+### Deploy Manual
+
+```bash
+npm run build
+```
+
+Arrastra la carpeta `dist` a Netlify.
+
+## Documentación
+
+- **Google Sheets API**: Ver `GUIA_API_GOOGLE_SHEETS.md`
+- **Configuración de Sheets**: Ver `CONFIGURACION_GOOGLE_SHEETS.md`

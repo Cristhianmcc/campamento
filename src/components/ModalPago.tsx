@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { campamentoConfig, InscripcionData } from "../config/campamento";
 import { CheckCircle2, Copy, Info, MessageCircle } from "lucide-react";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 
 interface ModalPagoProps {
   isOpen: boolean;
