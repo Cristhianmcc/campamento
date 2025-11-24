@@ -60,7 +60,7 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
     }
   };
 
-  const handleSendToWhatsApp = () => {
+  const handleSendToWhatsApp = async () => {
     if (!inscripcionData) return;
 
     // Validar que se haya adjuntado la captura
@@ -69,21 +69,59 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
       return;
     }
 
-    const mensaje = `Hola, he realizado el pago para el campamento.%0A%0A` +
-      `DNI: *${inscripcionData.codigoInscripcion}*%0A` +
-      `Nombre: ${inscripcionData.nombres} ${inscripcionData.apellidos}%0A` +
-      `Monto: ${campamentoConfig.precio}%0A%0A` +
+    const mensaje = `Hola, he realizado el pago para el campamento.\n\n` +
+      `DNI: *${inscripcionData.codigoInscripcion}*\n` +
+      `Nombre: ${inscripcionData.nombres} ${inscripcionData.apellidos}\n` +
+      `Monto: ${campamentoConfig.precio}\n\n` +
       `Adjunto captura del comprobante de pago.`;
 
-    const urlWhatsApp = `https://wa.me/${campamentoConfig.contacto.whatsapp}?text=${mensaje}`;
-    
     setPaymentConfirmed(true);
+
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // En móvil: Intentar usar Share API para adjuntar la imagen
+    if (isMobile && navigator.share && navigator.canShare) {
+      try {
+        const shareData = {
+          files: [capturaFile],
+          text: mensaje,
+        };
+
+        // Verificar si se puede compartir archivos
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          
+          toast.success("Comprobante compartido", {
+            description: "Selecciona WhatsApp para enviar el mensaje",
+            duration: 5000,
+          });
+          
+          setTimeout(() => {
+            onClose();
+            setPaymentConfirmed(false);
+            handleRemoveFile();
+          }, 1500);
+          return;
+        }
+      } catch (error: any) {
+        // Si el usuario cancela el share, resetear estado
+        if (error.name === 'AbortError') {
+          setPaymentConfirmed(false);
+          return;
+        }
+        console.warn('Error al compartir:', error);
+        // Continuar con el fallback de WhatsApp Web
+      }
+    }
+
+    // Desktop o fallback: Abrir WhatsApp Web solo con texto
+    const mensajeEncoded = encodeURIComponent(mensaje);
+    const urlWhatsApp = `https://wa.me/${campamentoConfig.contacto.whatsapp}?text=${mensajeEncoded}`;
     
-    // Nota: WhatsApp Web no permite adjuntar archivos directamente desde URL
-    // El usuario deberá adjuntar manualmente la imagen después de abrir WhatsApp
-    toast.info("Recuerda adjuntar la captura en WhatsApp", {
-      description: "La imagen no se adjunta automáticamente, deberás enviarla manualmente",
-      duration: 5000,
+    toast.info("Abriendo WhatsApp Web", {
+      description: "Recuerda adjuntar manualmente la captura de pago",
+      duration: 6000,
     });
     
     setTimeout(() => {
@@ -92,8 +130,8 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
         onClose();
         setPaymentConfirmed(false);
         handleRemoveFile();
-      }, 1500);
-    }, 2000);
+      }, 1000);
+    }, 1500);
   };
 
   return (

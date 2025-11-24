@@ -145,17 +145,6 @@ export default function App() {
             onClose={() => setModalPagoOpen(false)}
             inscripcionData={inscripcionGuardada}
           />
-
-          {/* Botón para ir a talleres - MEJORADO */}
-          <div className="fixed bottom-8 right-8 z-50">
-            <button
-              onClick={() => setVistaActual("acceso-talleres")}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 font-bold text-lg border-2 border-white flex items-center gap-2"
-            >
-              <Users className="w-5 h-5" />
-              Ir a Talleres
-            </button>
-          </div>
         </>
       )}
 

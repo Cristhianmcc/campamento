@@ -24,8 +24,8 @@ export const campamentoConfig = {
   
   // Google Sheets - Configuración para almacenar inscripciones
   googleSheets: {
-    apiKey: import.meta.env.VITE_GOOGLE_SHEETS_API_KEY || "AIzaSyBBh9Dw6HJ8mrnSm8_-Wn7FIzKQdpSRixU",
-    spreadsheetId: import.meta.env.VITE_SPREADSHEET_ID || "TU_SPREADSHEET_ID", // Reemplazar con el ID de tu hoja
+    apiKey: (import.meta as any).env?.VITE_GOOGLE_SHEETS_API_KEY || "AIzaSyBBh9Dw6HJ8mrnSm8_-Wn7FIzKQdpSRixU",
+    spreadsheetId: (import.meta as any).env?.VITE_SPREADSHEET_ID || "TU_SPREADSHEET_ID", // Reemplazar con el ID de tu hoja
     rangePendientes: "Pendientes!A:N", // Inscripciones esperando confirmación de pago
     rangeConfirmadas: "Confirmadas!A:N", // Inscripciones con pago confirmado
   },
@@ -34,7 +34,7 @@ export const campamentoConfig = {
   contacto: {
     email: "campamento@iglesianvida.org",
     telefono: "+51 987 654 321",
-    whatsapp: import.meta.env.VITE_WHATSAPP_NUMBER || "51987654321", // Solo números, sin + ni espacios
+    whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51987654321", // Solo números, sin + ni espacios
     direccion: "Av. Principal 123, Lima, Perú",
   },
   
