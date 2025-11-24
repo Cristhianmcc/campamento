@@ -77,7 +77,7 @@ app.post('/api/inscripciones', async (req, res) => {
       data.iglesia,
       data.necesidadesEspeciales || 'N/A',
       data.estadoPago, // "Pendiente" por defecto
-      new Date(data.fechaInscripcion).toLocaleString('es-PE'),
+      new Date(data.fechaInscripcion).toLocaleString('es-PE', { timeZone: 'America/Lima' }),
       data.fechaConfirmacion || '',
       data.tallerAsignado || '',
       data.fechaRegistroTaller || ''
@@ -232,7 +232,7 @@ app.post('/api/registrar-taller', async (req, res) => {
       requestBody: {
         values: [[
           tallerId,
-          new Date().toLocaleString('es-PE')
+          new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })
         ]]
       }
     });

@@ -33,8 +33,8 @@ export const campamentoConfig = {
   // Información de Contacto
   contacto: {
     email: "campamento@iglesianvida.org",
-    telefono: "+51 987 654 321",
-    whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51987654321", // Solo números, sin + ni espacios
+    telefono: "+51 955 195 324",
+    whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51955195324", // Solo números, sin + ni espacios
     direccion: "Av. Principal 123, Lima, Perú",
   },
   
