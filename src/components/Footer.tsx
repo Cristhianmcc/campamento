@@ -64,7 +64,7 @@ export function Footer() {
                 href={campamentoConfig.redesSociales.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-blue-800 hover:bg-blue-700 p-3 rounded-full transition-colors"
+                className="bg-blue-800 hover:bg-blue-900 p-3 rounded-full transition-colors border-2 border-transparent hover:border-blue-300"
                 aria-label="Facebook"
               >
                 <Facebook className="w-6 h-6" />
@@ -73,7 +73,7 @@ export function Footer() {
                 href={campamentoConfig.redesSociales.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-blue-800 hover:bg-blue-700 p-3 rounded-full transition-colors"
+                className="bg-blue-800 hover:bg-blue-900 p-3 rounded-full transition-colors border-2 border-transparent hover:border-blue-300"
                 aria-label="Instagram"
               >
                 <Instagram className="w-6 h-6" />

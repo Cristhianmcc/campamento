@@ -1,8 +1,12 @@
 import { campamentoConfig } from "../config/campamento";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Calendar, MapPin, ChevronDown } from "lucide-react";
+import { Calendar, MapPin, ChevronDown, Edit3, Users } from "lucide-react";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onIrATalleres?: () => void;
+}
+
+export function HeroSection({ onIrATalleres }: HeroSectionProps) {
   const scrollToForm = () => {
     const formElement = document.getElementById("inscripcion");
     if (formElement) {
@@ -60,14 +64,25 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* CTA Button */}
-          <div className="pt-4 sm:pt-6">
+          {/* CTA Buttons */}
+          <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={scrollToForm}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg w-full sm:w-auto max-w-xs"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
             >
+              <Edit3 className="w-5 h-5" />
               ¡Inscríbete Ahora!
             </button>
+            
+            {onIrATalleres && (
+              <button
+                onClick={onIrATalleres}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
+              >
+                <Users className="w-5 h-5" />
+                Acceder a Talleres
+              </button>
+            )}
           </div>
         </div>
 
