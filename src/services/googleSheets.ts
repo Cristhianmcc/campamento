@@ -6,10 +6,10 @@ import { InscripcionData } from "../config/campamento";
  * Este servicio se conecta a un backend Node.js que maneja
  * la autenticación con Google Sheets usando Service Account.
  * 
- * El backend debe estar corriendo en http://localhost:3001
+ * Backend desplegado en Render
  */
 
-const API_URL = 'http://localhost:3002/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://campamento-nz0r.onrender.com/api';
 
 export class GoogleSheetsService {
   constructor() {

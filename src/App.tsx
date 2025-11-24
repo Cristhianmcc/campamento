@@ -92,7 +92,8 @@ export default function App() {
     // Sincronizar talleres automáticamente después del registro exitoso
     if (resultado) {
       try {
-        await fetch('http://localhost:3002/api/sincronizar-talleres', {
+        const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://campamento-nz0r.onrender.com/api';
+        await fetch(`${API_URL}/sincronizar-talleres`, {
           method: 'POST'
         });
         console.log('✅ Talleres sincronizados automáticamente');
