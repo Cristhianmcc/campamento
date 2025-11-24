@@ -20,12 +20,27 @@ let auth;
 let sheets;
 
 try {
-  const keyFilePath = path.join(__dirname, '../service-account.json');
-  console.log('📁 Buscando archivo de credenciales en:', keyFilePath);
+  // En Render, buscar en /etc/secrets/service-account.json
+  // En local, buscar en la raíz del proyecto
+  const possiblePaths = [
+    '/etc/secrets/service-account.json',  // Render Secret Files
+    path.join(__dirname, 'service-account.json'),  // server/service-account.json
+    path.join(__dirname, '../service-account.json'),  // raíz del proyecto
+  ];
+
+  let keyFilePath = null;
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      keyFilePath = testPath;
+      console.log('✅ Credenciales encontradas en:', keyFilePath);
+      break;
+    }
+  }
   
-  if (!fs.existsSync(keyFilePath)) {
+  if (!keyFilePath) {
     console.error('❌ ERROR: No se encontró el archivo service-account.json');
-    console.error('   Asegúrate de que está en la raíz del proyecto');
+    console.error('   Rutas intentadas:');
+    possiblePaths.forEach(p => console.error(`   - ${p}`));
     process.exit(1);
   }
   
@@ -35,7 +50,7 @@ try {
   });
 
   sheets = google.sheets({ version: 'v4', auth });
-  console.log('✅ Credenciales cargadas correctamente');
+  console.log('✅ Google Sheets API configurada correctamente');
 } catch (error) {
   console.error('❌ Error al configurar Google Sheets:', error.message);
   process.exit(1);
