@@ -9,7 +9,7 @@ import { Footer } from "./components/Footer";
 import { googleSheetsService } from "./services/googleSheets";
 import { InscripcionData } from "./config/campamento";
 import { Toaster, toast } from "sonner";
-import { Users, Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
 
 type Vista = "inicio" | "acceso-talleres" | "seleccion-taller" | "taller-registrado";
 
