@@ -139,7 +139,7 @@ export function SeleccionTalleresPorDia({
   const totalSeleccionados = Object.values(selecciones).reduce((sum, arr) => sum + arr.length, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-12">
+    <div className="min-h-screen bg-[#F5F7FA] px-4 py-12">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -203,26 +203,30 @@ export function SeleccionTalleresPorDia({
             <button
               key={diaData.dia}
               onClick={() => setDiaActual(diaData.dia)}
+              style={{
+                color: diaActual === diaData.dia ? 'white' : '#1F2933',
+                backgroundColor: diaActual === diaData.dia ? '#E0B84C' : 'white'
+              }}
               className={`px-6 py-3 rounded-full font-semibold whitespace-nowrap transition-all ${
                 diaActual === diaData.dia
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-200'
+                  ? 'shadow-lg scale-105'
+                  : 'hover:bg-blue-50 border border-gray-200'
               }`}
             >
-              <Calendar className="w-4 h-4 inline mr-2" />
+              <Calendar className="w-4 h-4 inline mr-2" style={{ color: diaActual === diaData.dia ? 'white' : '#2258ccff' }} />
               Día {diaData.dia}
             </button>
           ))}
         </div>
 
         {/* Información del día */}
-        <Card className="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <Card className="mb-6 bg-white border-2 border-[#C2A36B]">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <Calendar className="w-6 h-6" />
+            <CardTitle className="flex items-center gap-2 font-['Playfair_Display'] text-[#1E3A8A] text-2xl">
+              <Calendar className="w-6 h-6 text-[#2563EB]" />
               Día {diaInfo.dia}: {diaInfo.titulo}
             </CardTitle>
-            <CardDescription className="text-blue-100">
+            <CardDescription className="font-['Inter'] text-[#1F2933] text-base">
               Seleccionados: {talleresSeleccionadosDelDia.length} / 2
             </CardDescription>
           </CardHeader>
@@ -259,8 +263,10 @@ export function SeleccionTalleresPorDia({
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                      <Badge className="mb-2 bg-blue-600">Taller {taller.numero}</Badge>
-                      <CardTitle className="text-lg">{taller.nombre}</CardTitle>
+                      <Badge className="mb-2" style={{ backgroundColor: '#E0B84C', color: 'white !important' }}>
+                        <span style={{ color: 'white !important' }}>Taller {taller.numero}</span>
+                      </Badge>
+                      <CardTitle style={{ fontSize: '1.125rem', color: '#1E3A8A' }}>{taller.nombre}</CardTitle>
                     </div>
                     <Checkbox
                       checked={isSeleccionado}
@@ -268,7 +274,7 @@ export function SeleccionTalleresPorDia({
                       className="mt-1"
                     />
                   </div>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm !text-[#1F2933] font-medium">
                     {taller.descripcion}
                   </CardDescription>
                 </CardHeader>
@@ -276,8 +282,8 @@ export function SeleccionTalleresPorDia({
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-medium text-gray-700">
+                      <Users className="w-4 h-4 text-[#2563EB]" />
+                      <span className="text-sm font-medium text-[#1F2933]">
                         {inscritosReales}/{taller.capacidadMaxima} inscritos
                       </span>
                     </div>
@@ -317,7 +323,7 @@ export function SeleccionTalleresPorDia({
           <Button
             onClick={onVolver}
             variant="outline"
-            className="flex-1"
+            className="flex-1 !text-[#1E3A8A] hover:!bg-[#F5F7FA] border-[#2563EB] hover:border-[#1E3A8A]"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Volver
@@ -325,7 +331,7 @@ export function SeleccionTalleresPorDia({
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting || totalSeleccionados < 4}
-            className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg py-6"
+            className="flex-1 bg-green-600 hover:bg-green-700 !text-white text-lg py-6"
           >
             {isSubmitting ? (
               "Registrando..."

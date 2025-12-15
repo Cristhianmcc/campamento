@@ -63,17 +63,11 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
   const handleSendToWhatsApp = async () => {
     if (!inscripcionData) return;
 
-    // Validar que se haya adjuntado la captura
-    if (!capturaFile) {
-      toast.error("Por favor adjunta la captura del comprobante de pago");
-      return;
-    }
-
     const mensaje = `Hola, he realizado el pago para el campamento.\n\n` +
       `DNI: *${inscripcionData.codigoInscripcion}*\n` +
       `Nombre: ${inscripcionData.nombres} ${inscripcionData.apellidos}\n` +
       `Monto: ${campamentoConfig.precio}\n\n` +
-      `Adjunto captura del comprobante de pago.`;
+      `*IMPORTANTE:* Adjunta la captura de tu pago cuando se abra WhatsApp.`;
 
     setPaymentConfirmed(true);
 
@@ -169,10 +163,10 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
             </div>
 
             {/* Información del monto */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sm:p-6 rounded-xl text-center">
-              <p className="text-xs sm:text-sm opacity-90 mb-2">Monto a pagar</p>
-              <p className="text-3xl sm:text-4xl font-bold">{campamentoConfig.precio}</p>
-              <p className="text-xs sm:text-sm opacity-90 mt-2">{campamentoConfig.precioDescripcion}</p>
+            <div className="p-4 sm:p-6 rounded-xl text-center border-2" style={{ backgroundColor: 'white', borderColor: '#C2A36B' }}>
+              <p className="text-xs sm:text-sm mb-2 font-['Inter']" style={{ color: '#6B7280' }}>Monto a pagar</p>
+              <p className="text-4xl sm:text-5xl font-bold font-['Inter']" style={{ color: '#1E3A8A' }}>{campamentoConfig.precio}</p>
+              <p className="text-xs sm:text-sm mt-2 font-['Inter']" style={{ color: '#1F2933' }}>{campamentoConfig.precioDescripcion}</p>
             </div>
 
             {/* Tabs para YAPE y PLIN */}
@@ -274,6 +268,18 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
               </div>
             </div>
 
+            {/* Instrucción importante */}
+            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-4">
+              <p className="text-sm font-semibold text-yellow-900 mb-2 flex items-center gap-2">
+                <Info className="w-5 h-5" />
+                ⚠️ Importante: Lee esto antes de enviar
+              </p>
+              <p className="text-sm text-yellow-800">
+                Adjunta tu captura aquí abajo para poder hacer clic en "Enviar por WhatsApp". 
+                <span className="font-bold"> Cuando se abra WhatsApp, deberás adjuntar la captura nuevamente de forma manual</span> antes de enviar el mensaje.
+              </p>
+            </div>
+
             {/* Sección de carga de archivo */}
             <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
               <p className="text-sm font-semibold text-blue-900 mb-3">
@@ -338,7 +344,7 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
               <Button
                 onClick={handleSendToWhatsApp}
                 disabled={!capturaFile}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-green-600 hover:bg-green-700 !text-white w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 <span className="text-sm sm:text-base">Enviar por WhatsApp</span>

@@ -91,17 +91,17 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-12">
+    <div className="min-h-screen bg-[#F5F7FA] px-4 py-12">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center bg-blue-100 rounded-full p-4 mb-4">
-            <UserCircle className="w-12 h-12 text-blue-600" />
+          <div className="inline-flex items-center justify-center bg-[#2563EB]/10 rounded-full p-4 mb-4">
+            <UserCircle className="w-12 h-12 text-[#2563EB]" />
           </div>
-          <h1 className="text-4xl font-bold text-blue-900 mb-2">
+          <h1 className="text-4xl font-bold text-[#1E3A8A] mb-2 font-['Playfair_Display']">
             Mi Inscripción
           </h1>
-          <p className="text-gray-600">
+          <p className="text-[#6B7280] font-['Inter']">
             Consulta tu información y el taller al que estás inscrito
           </p>
         </div>
@@ -130,20 +130,35 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={isLoading || dni.length < 8}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={isLoading || dni.length < 8}
+                    className="px-8 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 font-['Inter'] font-semibold border-2 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    style={{ 
+                      backgroundColor: '#1F2933',
+                      color: 'white',
+                      borderColor: '#E0B84C'
+                    }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading && dni.length >= 8) {
+                      e.currentTarget.style.backgroundColor = '#1E3A8A';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1F2933';
+                  }}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Buscando...
+                      <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'white' }} />
+                      <span style={{ color: 'white' }}>Buscando...</span>
                     </>
                   ) : (
-                    "Buscar mi inscripción"
+                    <span style={{ color: 'white' }}>Buscar mi inscripción</span>
                   )}
-                </Button>
+                  </button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -328,7 +343,8 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
               </Button>
               <Button
                 onClick={onVolver}
-                className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+                variant="outline"
+                className="flex-1"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Volver al Inicio

@@ -72,31 +72,31 @@ export function TalleresAcceso({ onAccesoPermitido, verificarPagoConfirmado }: T
   };
 
   return (
-    <section id="talleres-acceso" className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-b from-blue-50 to-white min-h-screen flex items-center">
+    <section id="talleres-acceso" className="py-12 sm:py-16 md:py-20 px-4 bg-[#F5F7FA] min-h-screen flex items-center">
       <div className="max-w-2xl mx-auto w-full">
         {/* Encabezado */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-block bg-blue-100 text-blue-600 px-4 py-2 rounded-full mb-4 text-sm sm:text-base">
+          <div className="inline-block bg-[#E0B84C]/20 text-[#1E3A8A] px-4 py-2 rounded-full mb-4 text-sm sm:text-base border border-[#C2A36B]/30 font-['Inter'] font-medium">
             Acceso a Talleres
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl text-blue-900 mb-4 leading-tight px-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl text-[#1E3A8A] mb-4 leading-tight px-2 font-['Playfair_Display'] font-bold">
             Registra tu Taller
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 px-4">
+          <p className="text-lg sm:text-xl text-[#6B7280] px-4 font-['Inter']">
             Ingresa tu DNI para acceder a la selección de talleres
           </p>
         </div>
 
         {/* Card de Acceso */}
-        <Card className="p-6 sm:p-8 md:p-12 shadow-2xl border-t-4 border-blue-500">
+        <Card className="p-6 sm:p-8 md:p-12 shadow-2xl border-t-4 border-[#2563EB]">
           <div className="flex justify-center mb-6">
-            <div className="bg-blue-100 p-4 rounded-full">
-              <Lock className="w-12 h-12 text-blue-600" />
+            <div className="bg-[#2563EB]/10 p-4 rounded-full">
+              <Lock className="w-12 h-12 text-[#2563EB]" />
             </div>
           </div>
 
-          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
-            <p className="text-sm text-gray-700">
+          <div className="bg-[#E0B84C]/10 p-4 rounded-lg border border-[#C2A36B]/40 mb-6">
+            <p className="text-sm text-[#1F2933] font-['Inter']">
               <strong>Nota importante:</strong> Solo podrás acceder si tu pago ya fue confirmado por el organizador.
               Si acabas de realizar el pago, espera la confirmación antes de intentar registrarte en un taller.
             </p>
@@ -105,7 +105,7 @@ export function TalleresAcceso({ onAccesoPermitido, verificarPagoConfirmado }: T
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Input DNI */}
             <div>
-              <Label htmlFor="dni-acceso" className="flex items-center gap-2 mb-2 text-blue-900 text-lg">
+              <Label htmlFor="dni-acceso" className="flex items-center gap-2 mb-2 text-[#1E3A8A] text-lg font-['Inter'] font-medium">
                 <CreditCard className="w-5 h-5" />
                 Ingresa tu DNI
               </Label>
@@ -131,21 +131,22 @@ export function TalleresAcceso({ onAccesoPermitido, verificarPagoConfirmado }: T
             <Button
               type="submit"
               disabled={isVerifying}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-6 text-lg rounded-full shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-white"
+              className="w-full bg-[#2563EB] hover:bg-[#1E3A8A] !text-white py-6 text-lg rounded-full shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-[#E0B84C] font-['Inter'] font-medium [&>*]:!text-white"
+              style={{ color: 'white', backgroundColor: '#1E3A8A' }}
             >
-              {isVerifying ? "Verificando..." : "Verificar y Continuar"}
+              <span style={{ color: 'white' }}>{isVerifying ? "Verificando..." : "Verificar y Continuar"}</span>
             </Button>
           </form>
 
           {/* Información adicional */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[#6B7280] font-['Inter']">
               ¿Problemas para acceder?{" "}
               <a
                 href={`https://wa.me/${campamentoConfig.contacto.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+                className="text-[#2563EB] hover:underline font-medium"
               >
                 Contacta con nosotros
               </a>

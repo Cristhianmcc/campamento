@@ -72,17 +72,17 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
   };
 
   return (
-    <section id="inscripcion" className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-b from-blue-50 to-white">
+    <section id="inscripcion" className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-b from-[#F5F7FA] to-white">
       <div className="max-w-3xl mx-auto">
         {/* Encabezado */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-block bg-orange-100 text-orange-600 px-4 py-2 rounded-full mb-4 text-sm sm:text-base">
+          <div className="inline-block bg-[#E0B84C]/20 text-[#1E3A8A] px-4 py-2 rounded-full mb-4 text-sm sm:text-base border border-[#C2A36B]/30 font-['Inter'] font-medium">
             Inscripción
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl text-blue-900 mb-4 leading-tight px-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl text-[#1E3A8A] mb-4 leading-tight px-2 font-['Playfair_Display'] font-bold">
             ¡Asegura tu Lugar!
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 px-4">
+          <p className="text-lg sm:text-xl text-[#6B7280] px-4 font-['Inter']">
             Completa el formulario y realiza tu pago para confirmar tu inscripción
           </p>
         </div>
@@ -90,12 +90,12 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
         {/* Formulario */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border-t-4 border-blue-500"
+          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border-t-4 border-[#2563EB]"
         >
           <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mb-6">
             {/* Nombres */}
             <div>
-              <Label htmlFor="nombres" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="nombres" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <User className="w-4 h-4" />
                 Nombres *
               </Label>
@@ -114,7 +114,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
             {/* Apellidos */}
             <div>
-              <Label htmlFor="apellidos" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="apellidos" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <User className="w-4 h-4" />
                 Apellidos *
               </Label>
@@ -133,7 +133,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
             {/* Edad */}
             <div>
-              <Label htmlFor="edad" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="edad" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <FileText className="w-4 h-4" />
                 Edad *
               </Label>
@@ -155,7 +155,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
             {/* DNI */}
             <div>
-              <Label htmlFor="dni" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="dni" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <CreditCard className="w-4 h-4" />
                 DNI *
               </Label>
@@ -175,7 +175,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
             {/* Email */}
             <div>
-              <Label htmlFor="email" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="email" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <Mail className="w-4 h-4" />
                 Email *
               </Label>
@@ -195,7 +195,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
             {/* Teléfono */}
             <div>
-              <Label htmlFor="telefono" className="flex items-center gap-2 mb-2 text-blue-900">
+              <Label htmlFor="telefono" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
                 <Phone className="w-4 h-4" />
                 Teléfono/WhatsApp *
               </Label>
@@ -215,7 +215,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
           {/* Iglesia */}
           <div className="mb-6">
-            <Label htmlFor="iglesia" className="flex items-center gap-2 mb-2 text-blue-900">
+            <Label htmlFor="iglesia" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
               <Church className="w-4 h-4" />
               Iglesia a la que perteneces *
             </Label>
@@ -234,7 +234,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
 
           {/* Necesidades Especiales */}
           <div className="mb-8">
-            <Label htmlFor="necesidadesEspeciales" className="mb-2 text-blue-900">
+            <Label htmlFor="necesidadesEspeciales" className="mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
               Necesidades especiales o alergias (opcional)
             </Label>
             <Textarea
@@ -252,11 +252,12 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg rounded-full shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+              variant="outline"
+              className="px-8 sm:px-12 py-3 w-full sm:w-auto"
             >
               {isSubmitting ? "Procesando..." : "Continuar al Pago"}
             </Button>
-            <p className="text-xs sm:text-sm text-gray-500 mt-4">
+            <p className="text-xs sm:text-sm text-[#6B7280] mt-4 font-['Inter']">
               * Campos obligatorios
             </p>
           </div>

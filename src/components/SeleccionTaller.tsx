@@ -79,14 +79,14 @@ export function SeleccionTaller({
   };
 
   return (
-    <section id="seleccion-talleres" className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-to-b from-white to-blue-50">
+    <section id="seleccion-talleres" className="py-12 sm:py-16 md:py-20 px-4 bg-[#F5F7FA]">
       <div className="max-w-7xl mx-auto">
         {/* Encabezado */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-block bg-green-100 text-green-600 px-4 py-2 rounded-full mb-4 text-sm sm:text-base">
+          <div className="inline-block bg-[#E0B84C]/20 text-[#1E3A8A] px-4 py-2 rounded-full mb-4 text-sm sm:text-base border border-[#C2A36B]/30 font-['Inter'] font-medium">
             Bienvenido, {datosUsuario?.nombres || "Participante"}
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl text-blue-900 mb-4 leading-tight px-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl text-[#1E3A8A] mb-4 leading-tight px-2 font-['Playfair_Display'] font-bold">
             Elige tu Taller
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 px-4 mb-6">
@@ -96,7 +96,7 @@ export function SeleccionTaller({
           <Button
             variant="outline"
             onClick={onVolver}
-            className="mb-4"
+            className="mb-4 !text-[#1E3A8A] hover:!bg-[#F5F7FA] border-[#2563EB] hover:border-[#1E3A8A]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
@@ -185,7 +185,7 @@ export function SeleccionTaller({
                   <Button
                     onClick={() => handleSeleccionarTaller(taller)}
                     disabled={estaLleno}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white disabled:opacity-50 disabled:cursor-not-allowed border-2 border-white"
+                    className="w-full bg-[#2563EB] hover:bg-[#1E3A8A] !text-white disabled:opacity-50 disabled:cursor-not-allowed border-2 border-[#E0B84C] font-['Inter'] font-medium"
                   >
                     {estaLleno ? "Taller Lleno" : "Seleccionar Taller"}
                   </Button>

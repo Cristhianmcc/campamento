@@ -152,7 +152,7 @@ export default function App() {
           />
 
           {/* Footer */}
-          <Footer />
+          {/* <Footer /> */}
 
           {/* Modal de Pago */}
           <ModalPago
@@ -174,7 +174,7 @@ export default function App() {
           <div className="fixed bottom-8 left-8 z-50">
             <button
               onClick={handleVolverAInicio}
-              className="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 font-semibold border-2 border-white flex items-center gap-2"
+              className="bg-[#1F2933] hover:bg-[#1E3A8A] !text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 font-['Inter'] font-semibold border-2 border-[#E0B84C] flex items-center gap-2"
             >
               <ArrowLeft className="w-5 h-5" />
               Volver al Inicio
@@ -193,7 +193,7 @@ export default function App() {
             onVolver={handleVolverDesdeSeleccion}
             registrarTalleres={handleRegistrarTalleresPorDia}
           />
-          <Footer />
+          {/* <Footer /> */}
         </>
       )}
 
@@ -221,7 +221,7 @@ export default function App() {
               <div className="space-y-4">
                 <button
                   onClick={handleVolverAInicio}
-                  className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105 font-bold border-2 border-white flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto bg-[#2563EB] hover:bg-[#1E3A8A] !text-white px-8 py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105 font-['Inter'] font-medium border-2 border-[#E0B84C] flex items-center justify-center gap-2"
                 >
                   <Home className="w-5 h-5" />
                   Volver al Inicio
