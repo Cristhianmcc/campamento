@@ -11,6 +11,22 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3002;
 
+// Mapeo de IDs de talleres a nombres completos
+const TALLERES_NOMBRES = {
+  'dia1-taller1': 'Resiliencia y esperanza',
+  'dia1-taller2': 'Amistad, enamoramiento y noviazgo',
+  'dia1-taller3': 'Identidad en la era digital',
+  'dia2-taller1': 'Finanzas inteligentes',
+  'dia2-taller2': 'Música y contenido',
+  'dia2-taller3': 'Verdad vs relativismo',
+  'dia3-taller1': 'Propósito y vocación',
+  'dia3-taller2': 'Misiones',
+  'dia3-taller3': 'Orientación vocacional y elección de carrera',
+  'dia4-taller1': 'Impacto comunitario',
+  'dia4-taller2': 'Comunicación y redes sociales',
+  'dia4-taller3': 'Proyecto de vida recargado'
+};
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -79,13 +95,21 @@ app.post('/api/inscripciones', async (req, res) => {
       data.estadoPago, // "Pendiente" por defecto
       new Date(data.fechaInscripcion).toLocaleString('es-PE', { timeZone: 'America/Lima' }),
       data.fechaConfirmacion || '',
-      data.tallerAsignado || '',
-      data.fechaRegistroTaller || ''
+      '', // Columna M - Ya no se usa (mantener para compatibilidad)
+      '', // Columna N - Ya no se usa
+      '', // Columna O - Día 1 Taller 1
+      '', // Columna P - Día 1 Taller 2
+      '', // Columna Q - Día 2 Taller 1
+      '', // Columna R - Día 2 Taller 2
+      '', // Columna S - Día 3 Taller 1
+      '', // Columna T - Día 3 Taller 2
+      '', // Columna U - Día 4 Taller 1
+      ''  // Columna V - Día 4 Taller 2
     ]];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N',
+      range: 'Inscripciones!A:V', // Actualizado a columna V
       valueInputOption: 'USER_ENTERED',
       requestBody: { values }
     });
@@ -179,7 +203,7 @@ app.get('/api/verificar-taller/:dni', async (req, res) => {
 
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N', // Hoja única
+      range: 'Inscripciones!A:V', // Incluir nuevas columnas
     });
 
     const rows = result.data.values || [];
@@ -187,8 +211,17 @@ app.get('/api/verificar-taller/:dni', async (req, res) => {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (row[4] === dni) {
-        const tieneTaller = row[12] && row[12] !== '';
-        return res.json({ tieneTaller });
+        const tieneTallerAntiguo = row[12] && row[12] !== '';
+        
+        // Verificar también columnas O-V (sistema nuevo de talleres por día)
+        const talleresNuevos = row.slice(14, 22); // columnas O-V
+        const tieneTalleresNuevos = talleresNuevos && talleresNuevos.some(t => t && t.trim() !== '');
+        
+        const tieneTaller = tieneTallerAntiguo || tieneTalleresNuevos;
+        return res.json({ 
+          tieneTaller,
+          talleresRegistrados: tieneTalleresNuevos ? talleresNuevos : null
+        });
       }
     }
 
@@ -244,7 +277,134 @@ app.post('/api/registrar-taller', async (req, res) => {
   }
 });
 
-// 6. Sincronizar talleres - Crear/actualizar hojas por taller
+// 5B. Registrar múltiples talleres por día (NUEVO SISTEMA)
+app.post('/api/registrar-talleres-por-dia', async (req, res) => {
+  try {
+    const { dni, talleres } = req.body;
+    // talleres es un array de { dia: number, talleres: string[] }
+    
+    if (!dni || !talleres || !Array.isArray(talleres)) {
+      return res.status(400).json({ success: false, error: 'Datos inválidos' });
+    }
+
+    // Buscar la fila del usuario
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Inscripciones!A:V',
+    });
+
+    const rows = result.data.values || [];
+    let rowIndex = -1;
+    let filaUsuario = null;
+
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i][4] === dni) {
+        rowIndex = i + 1;
+        filaUsuario = rows[i];
+        break;
+      }
+    }
+
+    if (rowIndex === -1) {
+      return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+    }
+
+    // VERIFICAR SI YA TIENE TALLERES REGISTRADOS (columnas O-V, índices 14-21)
+    const talleresExistentes = filaUsuario.slice(14, 22); // columnas O-V
+    const tieneAlgunTaller = talleresExistentes.some(t => t && t.trim() !== '');
+    
+    if (tieneAlgunTaller) {
+      console.log(`⚠️ Usuario ${dni} ya tiene talleres registrados`);
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Ya tienes talleres registrados. No puedes inscribirte nuevamente.' 
+      });
+    }
+
+    // Preparar los datos para actualizar
+    // Columnas: O(14), P(15), Q(16), R(17), S(18), T(19), U(20), V(21)
+    const talleresPorColumna = ['', '', '', '', '', '', '', '']; // 8 columnas para talleres
+
+    talleres.forEach(diaData => {
+      const dia = diaData.dia;
+      const talleresDelDia = diaData.talleres;
+
+      if (dia >= 1 && dia <= 4 && Array.isArray(talleresDelDia)) {
+        const baseIndex = (dia - 1) * 2; // Cada día tiene 2 columnas
+        
+        // Convertir IDs a NOMBRES completos
+        if (talleresDelDia[0]) {
+          const nombreTaller = TALLERES_NOMBRES[talleresDelDia[0]] || talleresDelDia[0];
+          talleresPorColumna[baseIndex] = nombreTaller;
+        }
+        if (talleresDelDia[1]) {
+          const nombreTaller = TALLERES_NOMBRES[talleresDelDia[1]] || talleresDelDia[1];
+          talleresPorColumna[baseIndex + 1] = nombreTaller;
+        }
+      }
+    });
+
+    // Actualizar columnas O a V (índices 14 a 21 en la hoja)
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `Inscripciones!O${rowIndex}:V${rowIndex}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [talleresPorColumna]
+      }
+    });
+
+    console.log(`✅ Talleres registrados para DNI ${dni}:`, talleresPorColumna);
+    res.json({ success: true, message: 'Talleres registrados exitosamente' });
+  } catch (error) {
+    console.error('Error al registrar talleres por día:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 6. Obtener datos completos del usuario por DNI (para perfil)
+app.get('/api/perfil/:dni', async (req, res) => {
+  try {
+    const { dni } = req.params;
+
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Inscripciones!A:N',
+    });
+
+    const rows = result.data.values || [];
+
+    // Buscar DNI en columna E (índice 4)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[4] === dni) {
+        return res.json({
+          encontrado: true,
+          datos: {
+            codigo: row[0],
+            nombres: row[1],
+            apellidos: row[2],
+            edad: row[3],
+            dni: row[4],
+            email: row[5],
+            telefono: row[6],
+            iglesia: row[7],
+            estadoPago: row[9] || 'Pendiente',
+            fechaInscripcion: row[10],
+            tallerAsignado: row[12] || null
+          }
+        });
+      }
+    }
+
+    res.json({ encontrado: false, datos: null });
+  } catch (error) {
+    console.error('Error al obtener perfil:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 7. Sincronizar talleres - Crear/actualizar hojas por taller
 app.post('/api/sincronizar-talleres', async (req, res) => {
   try {
     console.log('📊 Sincronizando talleres...');
@@ -385,6 +545,7 @@ const server = app.listen(PORT, () => {
   console.log(`  GET    http://localhost:${PORT}/api/verificar-pago/:dni`);
   console.log(`  GET    http://localhost:${PORT}/api/verificar-taller/:dni`);
   console.log(`  POST   http://localhost:${PORT}/api/registrar-taller`);
+  console.log(`  GET    http://localhost:${PORT}/api/perfil/:dni`);
   console.log(`  POST   http://localhost:${PORT}/api/sincronizar-talleres`);
   console.log('');
   console.log('⏳ Esperando peticiones...');

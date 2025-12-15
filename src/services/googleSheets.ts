@@ -9,7 +9,7 @@ import { InscripcionData } from "../config/campamento";
  * Backend desplegado en Render
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://campamento-nz0r.onrender.com/api';
+const API_URL = 'http://localhost:3002/api'; // Cambiar a Render en producción
 
 export class GoogleSheetsService {
   constructor() {
@@ -123,6 +123,56 @@ export class GoogleSheetsService {
       return result.success;
     } catch (error) {
       console.error('Error al registrar en taller:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Registra múltiples talleres por día (NUEVO SISTEMA)
+   */
+  async registrarTalleresPorDia(dni: string, talleres: Array<{ dia: number, talleres: string[] }>): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/registrar-talleres-por-dia`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dni, talleres }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Mostrar el mensaje específico del servidor
+        throw new Error(result.error || 'Error al registrar talleres por día');
+      }
+
+      console.log('✅ Talleres por día registrados:', result);
+      return result.success;
+    } catch (error: any) {
+      console.error('Error al registrar talleres por día:', error);
+      // Propagar el error con el mensaje específico
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene los datos completos del usuario para el perfil
+   */
+  async obtenerDatosPerfil(dni: string): Promise<any | null> {
+    try {
+      const response = await fetch(`${API_URL}/perfil/${dni}`);
+      
+      if (!response.ok) {
+        console.error('Error en la respuesta:', response.status, response.statusText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('Resultado del perfil:', result);
+      return result.encontrado ? result.datos : null;
+    } catch (error) {
+      console.error('Error al obtener datos del perfil:', error);
       throw error;
     }
   }

@@ -1,12 +1,13 @@
 import { campamentoConfig } from "../config/campamento";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Calendar, MapPin, ChevronDown, Edit3, Users } from "lucide-react";
+import { Calendar, MapPin, ChevronDown, Edit3, Users, UserCircle } from "lucide-react";
 
 interface HeroSectionProps {
   onIrATalleres?: () => void;
+  onVerMiPerfil?: () => void;
 }
 
-export function HeroSection({ onIrATalleres }: HeroSectionProps) {
+export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) {
   const scrollToForm = () => {
     const formElement = document.getElementById("inscripcion");
     if (formElement) {
@@ -81,6 +82,16 @@ export function HeroSection({ onIrATalleres }: HeroSectionProps) {
               >
                 <Users className="w-5 h-5" />
                 Acceder a Talleres
+              </button>
+            )}
+
+            {onVerMiPerfil && (
+              <button
+                onClick={onVerMiPerfil}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
+              >
+                <UserCircle className="w-5 h-5" />
+                Mi Inscripción
               </button>
             )}
           </div>

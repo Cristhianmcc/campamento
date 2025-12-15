@@ -53,7 +53,132 @@ export const campamentoConfig = {
     youtube: "https://youtube.com/iglesianvida",
   },
 
-  // Talleres Disponibles
+  // Talleres Disponibles - Sistema por Días
+  // Cada día tiene 3 talleres, cada persona puede elegir 2 por día
+  talleresPorDia: [
+    {
+      dia: 1,
+      titulo: "El me llama por mi nombre",
+      talleres: [
+        {
+          id: "dia1-taller1",
+          numero: 1,
+          nombre: "Resiliencia y esperanza",
+          descripcion: "Objetivo: problema de la frustración y ansiedad",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia1-taller2",
+          numero: 2,
+          nombre: "Amistad, enamoramiento y noviazgo",
+          descripcion: "Objetivo: problemas en los tiempos de superficialidad",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia1-taller3",
+          numero: 3,
+          nombre: "Identidad en la era digital",
+          descripcion: "Objetivo: problemas con la presión social y cultural",
+          capacidadMaxima: 17,
+          inscritos: 0
+        }
+      ]
+    },
+    {
+      dia: 2,
+      titulo: "El transforma mi manera de vivir",
+      talleres: [
+        {
+          id: "dia2-taller1",
+          numero: 1,
+          nombre: "Finanzas inteligentes",
+          descripcion: "Objetivo: Ser un buen administrador. Educación financiera en la juventud",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia2-taller2",
+          numero: 2,
+          nombre: "Música y contenido",
+          descripcion: "Objetivo: Lo que consumo forma lo que soy",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia2-taller3",
+          numero: 3,
+          nombre: "Verdad vs relativismo",
+          descripcion: "Objetivo: mi verdad y la verdad del evangelio, dilema ético",
+          capacidadMaxima: 17,
+          inscritos: 0
+        }
+      ]
+    },
+    {
+      dia: 3,
+      titulo: "El guía mi vocación",
+      talleres: [
+        {
+          id: "dia3-taller1",
+          numero: 1,
+          nombre: "Propósito y vocación",
+          descripcion: "Objetivo: Dones y talentos conectados con la visión de Dios",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia3-taller2",
+          numero: 2,
+          nombre: "Misiones",
+          descripcion: "Objetivo: ayudar a los jóvenes a comprender qué significa misión en un sentido integral",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia3-taller3",
+          numero: 3,
+          nombre: "Orientación vocacional y elección de carrera",
+          descripcion: "Objetivo: ¿Cómo descubro mi llamado?",
+          capacidadMaxima: 17,
+          inscritos: 0
+        }
+      ]
+    },
+    {
+      dia: 4,
+      titulo: "El me envía al mundo",
+      talleres: [
+        {
+          id: "dia4-taller1",
+          numero: 1,
+          nombre: "Impacto comunitario",
+          descripcion: "Objetivo: Cómo ser sal y luz en mi barrio",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia4-taller2",
+          numero: 2,
+          nombre: "Comunicación y redes sociales",
+          descripcion: "Objetivo: Impacto digital",
+          capacidadMaxima: 17,
+          inscritos: 0
+        },
+        {
+          id: "dia4-taller3",
+          numero: 3,
+          nombre: "Proyecto de vida recargado",
+          descripcion: "Objetivo: Mi historia como carta abierta",
+          capacidadMaxima: 17,
+          inscritos: 0
+        }
+      ]
+    }
+  ],
+
+  // Mantener talleres antiguos para compatibilidad (se eliminará después)
   talleres: [
     {
       id: "taller-1",

@@ -5,13 +5,15 @@ import { FormularioInscripcion } from "./components/FormularioInscripcion";
 import { ModalPago } from "./components/ModalPago";
 import { TalleresAcceso } from "./components/TalleresAcceso";
 import { SeleccionTaller } from "./components/SeleccionTaller";
+import { SeleccionTalleresPorDia } from "./components/SeleccionTalleresPorDia";
+import { MiPerfil } from "./components/MiPerfil";
 import { Footer } from "./components/Footer";
 import { googleSheetsService } from "./services/googleSheets";
 import { InscripcionData } from "./config/campamento";
 import { Toaster, toast } from "sonner";
 import { Home, ArrowLeft } from "lucide-react";
 
-type Vista = "inicio" | "acceso-talleres" | "seleccion-taller" | "taller-registrado";
+type Vista = "inicio" | "acceso-talleres" | "seleccion-taller" | "taller-registrado" | "mi-perfil";
 
 export default function App() {
   const [vistaActual, setVistaActual] = useState<Vista>("inicio");
@@ -72,12 +74,12 @@ export default function App() {
     setDniUsuario(dni);
     setDatosUsuario(datos);
 
-    // Verificar si ya tiene un taller asignado
+    // Verificar si ya tiene talleres asignados (sistema nuevo)
     const yaRegistrado = await googleSheetsService.verificarTallerAsignado(dni);
     
     if (yaRegistrado) {
-      toast.info("Ya estás registrado en un taller", {
-        description: "No puedes registrarte en más talleres.",
+      toast.info("Ya estás registrado en talleres", {
+        description: "Ya completaste tu inscripción a talleres.",
         duration: 5000,
       });
       setVistaActual("taller-registrado");
@@ -86,13 +88,13 @@ export default function App() {
     }
   };
 
+  // Sistema anterior - mantener por compatibilidad
   const handleRegistrarEnTaller = async (dni: string, tallerId: string) => {
     const resultado = await googleSheetsService.registrarEnTaller(dni, tallerId);
     
-    // Sincronizar talleres automáticamente después del registro exitoso
     if (resultado) {
       try {
-        const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://campamento-nz0r.onrender.com/api';
+        const API_URL = 'http://localhost:3002/api';
         await fetch(`${API_URL}/sincronizar-talleres`, {
           method: 'POST'
         });
@@ -102,6 +104,12 @@ export default function App() {
       }
     }
     
+    return resultado;
+  };
+
+  // NUEVO SISTEMA: Registrar múltiples talleres por día
+  const handleRegistrarTalleresPorDia = async (dni: string, talleres: Array<{ dia: number, talleres: string[] }>) => {
+    const resultado = await googleSheetsService.registrarTalleresPorDia(dni, talleres);
     return resultado;
   };
 
@@ -119,6 +127,10 @@ export default function App() {
     setVistaActual("acceso-talleres");
   };
 
+  const handleVerificarDatosPerfil = async (dni: string) => {
+    return await googleSheetsService.obtenerDatosPerfil(dni);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Toaster position="top-right" richColors />
@@ -126,7 +138,10 @@ export default function App() {
       {vistaActual === "inicio" && (
         <>
           {/* Hero Section */}
-          <HeroSection onIrATalleres={() => setVistaActual("acceso-talleres")} />
+          <HeroSection 
+            onIrATalleres={() => setVistaActual("acceso-talleres")}
+            onVerMiPerfil={() => setVistaActual("mi-perfil")}
+          />
 
           {/* Acerca del Campamento */}
           <AcercaDelCampamento />
@@ -171,12 +186,13 @@ export default function App() {
 
       {vistaActual === "seleccion-taller" && (
         <>
-          <SeleccionTaller
+          {/* NUEVO SISTEMA: Selección de talleres por día */}
+          <SeleccionTalleresPorDia
             dniUsuario={dniUsuario}
             datosUsuario={datosUsuario}
-            onTallerRegistrado={handleTallerRegistrado}
+            onTalleresRegistrados={handleTallerRegistrado}
             onVolver={handleVolverDesdeSeleccion}
-            registrarEnTaller={handleRegistrarEnTaller}
+            registrarTalleres={handleRegistrarTalleresPorDia}
           />
           <Footer />
         </>
@@ -215,6 +231,13 @@ export default function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {vistaActual === "mi-perfil" && (
+        <MiPerfil
+          onVolver={handleVolverAInicio}
+          verificarDatos={handleVerificarDatosPerfil}
+        />
       )}
     </div>
   );
