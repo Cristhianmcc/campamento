@@ -78,13 +78,12 @@ export default function App() {
     const yaRegistrado = await googleSheetsService.verificarTallerAsignado(dni);
     
     if (yaRegistrado) {
-      toast.info("Ya estás registrado en talleres", {
-        description: "Ya completaste tu inscripción a talleres.",
-        duration: 5000,
-      });
+      // No mostrar toast aquí porque ya se mostró en TalleresAcceso
       setVistaActual("taller-registrado");
+      return { yaRegistrado: true };
     } else {
       setVistaActual("seleccion-taller");
+      return { yaRegistrado: false };
     }
   };
 

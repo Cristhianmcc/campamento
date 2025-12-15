@@ -6,9 +6,10 @@ import { Card } from "./ui/card";
 import { CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { campamentoConfig } from "../config/campamento";
+import { googleSheetsService } from "../services/googleSheets";
 
 interface TalleresAccesoProps {
-  onAccesoPermitido: (dni: string, datosUsuario: any) => void;
+  onAccesoPermitido: (dni: string, datosUsuario: any) => Promise<{ yaRegistrado: boolean }>;
   verificarPagoConfirmado: (dni: string) => Promise<{ permitido: boolean; datos: any }>;
 }
 
@@ -34,10 +35,24 @@ export function TalleresAcceso({ onAccesoPermitido, verificarPagoConfirmado }: T
       const resultado = await verificarPagoConfirmado(dni);
 
       if (resultado.permitido) {
-        toast.success("¡Acceso permitido!", {
-          description: "Tu pago ha sido confirmado. Bienvenido a la selección de talleres.",
-        });
-        onAccesoPermitido(dni, resultado.datos);
+        // PRIMERO verificar si ya tiene talleres registrados
+        const yaTieneTalleres = await googleSheetsService.verificarTallerAsignado(dni);
+        
+        if (yaTieneTalleres) {
+          // Si ya tiene talleres, solo llamar a onAccesoPermitido y mostrar mensaje de ya registrado
+          await onAccesoPermitido(dni, resultado.datos);
+          toast.info("Ya estás registrado en talleres", {
+            description: "Ya completaste tu inscripción a talleres.",
+            duration: 5000,
+          });
+        } else {
+          // Si no tiene talleres, mostrar mensaje de bienvenida
+          toast.success("¡Acceso permitido!", {
+            description: "Tu pago ha sido confirmado. Bienvenido a la selección de talleres.",
+            duration: 4000,
+          });
+          await onAccesoPermitido(dni, resultado.datos);
+        }
       } else {
         toast.error("Acceso denegado", {
           description: "Tu pago aún no ha sido confirmado. Por favor, contacta con el organizador.",

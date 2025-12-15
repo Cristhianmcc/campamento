@@ -19,19 +19,31 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
     <section className="relative min-h-screen h-screen w-full overflow-hidden">
       {/* Imagen de fondo con overlay */}
       <div className="absolute inset-0">
-        <ImageWithFallback
-          src={campamentoConfig.imagenHero}
-          alt="Campamento Cristiano"
-          className="w-full h-full object-cover"
+        {/* Imagen de fondo principal con gradiente de respaldo */}
+        <div 
+          className="w-full h-full bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/hero-campamento.png')",
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 30%',
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/70 via-blue-800/60 to-blue-900/80"></div>
+        {/* Overlay oscuro con tonos sepia/marrón para mantener legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/70 via-stone-900/75 to-amber-950/80"></div>
+        {/* Efecto de desenfoque sobre toda la imagen */}
+        <div className="absolute inset-0 backdrop-blur-[2px]"></div>
+        {/* Viñeta en los bordes */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%)'
+        }}></div>
       </div>
 
       {/* Contenido */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 text-white py-20">
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
           {/* Badge de año */}
-          <div className="inline-block bg-white/20 backdrop-blur-sm px-4 sm:px-6 py-2 rounded-full border border-white/30 text-sm sm:text-base">
+          <div className="inline-block bg-amber-800/30 backdrop-blur-sm px-4 sm:px-6 py-2 rounded-full border border-amber-400/40 text-sm sm:text-base">
             <span className="text-yellow-300">✝</span> {campamentoConfig.fechas.split(" ").pop()}
           </div>
 
@@ -41,17 +53,17 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
           </h1>
 
           {/* Lema */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 max-w-2xl mx-auto px-4">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-amber-100 max-w-2xl mx-auto px-4">
             {campamentoConfig.lema}
           </p>
 
           {/* Información clave */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center items-center pt-2 sm:pt-4">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-white/20 w-full sm:w-auto">
+            <div className="flex items-center gap-2 bg-amber-800/20 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-amber-400/30 w-full sm:w-auto">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 flex-shrink-0" />
               <span className="text-sm sm:text-base">{campamentoConfig.fechas}</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-white/20 w-full sm:w-auto">
+            <div className="flex items-center gap-2 bg-amber-800/20 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-amber-400/30 w-full sm:w-auto">
               <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 flex-shrink-0" />
               <span className="text-sm sm:text-base truncate">{campamentoConfig.lugar}</span>
             </div>
@@ -69,7 +81,7 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
           <div className="pt-4 sm:pt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={scrollToForm}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-amber-200 flex items-center justify-center gap-2"
             >
               <Edit3 className="w-5 h-5" />
               ¡Inscríbete Ahora!
@@ -78,7 +90,7 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
             {onIrATalleres && (
               <button
                 onClick={onIrATalleres}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
+                className="bg-amber-800/40 backdrop-blur-sm hover:bg-amber-700/60 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-amber-400/50 flex items-center justify-center gap-2"
               >
                 <Users className="w-5 h-5" />
                 Acceder a Talleres
@@ -88,7 +100,7 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
             {onVerMiPerfil && (
               <button
                 onClick={onVerMiPerfil}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-white flex items-center justify-center gap-2"
+                className="bg-amber-800/40 backdrop-blur-sm hover:bg-amber-700/60 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-xl transition-all duration-300 hover:scale-105 text-base sm:text-lg font-bold w-full sm:w-auto max-w-xs border-2 border-amber-400/50 flex items-center justify-center gap-2"
               >
                 <UserCircle className="w-5 h-5" />
                 Mi Inscripción

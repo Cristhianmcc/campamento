@@ -362,6 +362,59 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
   }
 });
 
+// 5C. Obtener cupos disponibles por taller (NUEVO)
+app.get('/api/cupos-talleres', async (req, res) => {
+  try {
+    console.log('📊 Obteniendo cupos de talleres...');
+    
+    // Obtener todas las inscripciones
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Inscripciones!A:V',
+    });
+
+    const rows = result.data.values || [];
+    
+    // Contar inscritos por taller
+    const inscritosPorTaller = {};
+    
+    // Inicializar contadores para todos los talleres
+    for (let dia = 1; dia <= 4; dia++) {
+      for (let taller = 1; taller <= 3; taller++) {
+        const tallerId = `dia${dia}-taller${taller}`;
+        inscritosPorTaller[tallerId] = 0;
+      }
+    }
+    
+    // Contar inscritos (saltar la fila de encabezados)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      
+      // Leer columnas O-V (índices 14-21)
+      // O=Día1-T1, P=Día1-T2, Q=Día2-T1, R=Día2-T2, S=Día3-T1, T=Día3-T2, U=Día4-T1, V=Día4-T2
+      const talleres = row.slice(14, 22);
+      
+      talleres.forEach(nombreTaller => {
+        if (nombreTaller && nombreTaller.trim() !== '') {
+          // Buscar el ID del taller por su nombre
+          for (const [tallerId, nombre] of Object.entries(TALLERES_NOMBRES)) {
+            if (nombre === nombreTaller.trim()) {
+              inscritosPorTaller[tallerId] = (inscritosPorTaller[tallerId] || 0) + 1;
+              break;
+            }
+          }
+        }
+      });
+    }
+    
+    console.log('✅ Cupos calculados:', inscritosPorTaller);
+    res.json({ success: true, inscritos: inscritosPorTaller });
+  } catch (error) {
+    console.error('Error al obtener cupos:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 6. Obtener datos completos del usuario por DNI (para perfil)
 app.get('/api/perfil/:dni', async (req, res) => {
   try {
@@ -369,7 +422,7 @@ app.get('/api/perfil/:dni', async (req, res) => {
 
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N',
+      range: 'Inscripciones!A:V', // Incluir columnas de talleres
     });
 
     const rows = result.data.values || [];
@@ -378,6 +431,14 @@ app.get('/api/perfil/:dni', async (req, res) => {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (row[4] === dni) {
+        // Extraer talleres de columnas O-V (índices 14-21)
+        const talleresPorDia = {
+          dia1: [row[14] || null, row[15] || null].filter(t => t),
+          dia2: [row[16] || null, row[17] || null].filter(t => t),
+          dia3: [row[18] || null, row[19] || null].filter(t => t),
+          dia4: [row[20] || null, row[21] || null].filter(t => t)
+        };
+        
         return res.json({
           encontrado: true,
           datos: {
@@ -391,7 +452,8 @@ app.get('/api/perfil/:dni', async (req, res) => {
             iglesia: row[7],
             estadoPago: row[9] || 'Pendiente',
             fechaInscripcion: row[10],
-            tallerAsignado: row[12] || null
+            tallerAsignado: row[12] || null, // Sistema antiguo (mantener compatibilidad)
+            talleresPorDia // Sistema nuevo
           }
         });
       }
@@ -545,6 +607,8 @@ const server = app.listen(PORT, () => {
   console.log(`  GET    http://localhost:${PORT}/api/verificar-pago/:dni`);
   console.log(`  GET    http://localhost:${PORT}/api/verificar-taller/:dni`);
   console.log(`  POST   http://localhost:${PORT}/api/registrar-taller`);
+  console.log(`  POST   http://localhost:${PORT}/api/registrar-talleres-por-dia`);
+  console.log(`  GET    http://localhost:${PORT}/api/cupos-talleres`);
   console.log(`  GET    http://localhost:${PORT}/api/perfil/:dni`);
   console.log(`  POST   http://localhost:${PORT}/api/sincronizar-talleres`);
   console.log('');

@@ -157,6 +157,25 @@ export class GoogleSheetsService {
   }
 
   /**
+   * Obtiene los cupos disponibles de cada taller
+   */
+  async obtenerCuposTalleres(): Promise<Record<string, number>> {
+    try {
+      const response = await fetch(`${API_URL}/cupos-talleres`);
+      
+      if (!response.ok) {
+        throw new Error('Error al obtener cupos de talleres');
+      }
+
+      const result = await response.json();
+      return result.inscritos || {};
+    } catch (error) {
+      console.error('Error al obtener cupos:', error);
+      return {};
+    }
+  }
+
+  /**
    * Obtiene los datos completos del usuario para el perfil
    */
   async obtenerDatosPerfil(dni: string): Promise<any | null> {

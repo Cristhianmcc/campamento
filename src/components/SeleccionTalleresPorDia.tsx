@@ -6,6 +6,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Alert, AlertDescription } from "./ui/alert";
 import { ArrowLeft, Check, Users, AlertCircle, Calendar } from "lucide-react";
 import { campamentoConfig } from "../config/campamento";
+import { googleSheetsService } from "../services/googleSheets";
 import { toast } from "sonner";
 
 interface TallerSeleccionado {
@@ -36,6 +37,27 @@ export function SeleccionTalleresPorDia({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [diaActual, setDiaActual] = useState(1);
+  const [inscritosPorTaller, setInscritosPorTaller] = useState<Record<string, number>>({});
+  const [cargandoCupos, setCargandoCupos] = useState(true);
+
+  // Cargar cupos al montar el componente
+  useEffect(() => {
+    const cargarCupos = async () => {
+      setCargandoCupos(true);
+      try {
+        const cupos = await googleSheetsService.obtenerCuposTalleres();
+        setInscritosPorTaller(cupos);
+        console.log('📊 Cupos cargados:', cupos);
+      } catch (error) {
+        console.error('Error al cargar cupos:', error);
+        toast.error('No se pudieron cargar los cupos disponibles');
+      } finally {
+        setCargandoCupos(false);
+      }
+    };
+    
+    cargarCupos();
+  }, []);
 
   const handleToggleTaller = (dia: number, tallerId: string) => {
     setSelecciones(prev => {
@@ -48,6 +70,17 @@ export function SeleccionTalleresPorDia({
           [dia]: talleresDelDia.filter(id => id !== tallerId)
         };
       } else {
+        // Verificar si el taller está lleno ANTES de agregar
+        const inscritos = inscritosPorTaller[tallerId] || 0;
+        const capacidad = 17;
+        
+        if (inscritos >= capacidad) {
+          toast.error('Este taller ya está lleno', {
+            description: `Capacidad máxima: ${capacidad} personas alcanzada`
+          });
+          return prev;
+        }
+        
         // Agregar taller (máximo 2 por día)
         if (talleresDelDia.length >= 2) {
           toast.error(`Solo puedes seleccionar 2 talleres por día`);
@@ -124,6 +157,16 @@ export function SeleccionTalleresPorDia({
           </div>
         </div>
 
+        {/* Loading de cupos */}
+        {cargandoCupos && (
+          <Alert className="mb-6 bg-blue-50 border-blue-200">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-900">
+              Cargando disponibilidad de talleres...
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Resumen de selecciones */}
         <Card className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
           <CardContent className="pt-6">
@@ -189,17 +232,20 @@ export function SeleccionTalleresPorDia({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {diaInfo.talleres.map((taller) => {
             const isSeleccionado = talleresSeleccionadosDelDia.includes(taller.id);
-            const cuposDisponibles = taller.capacidadMaxima - taller.inscritos;
-            const estaLleno = cuposDisponibles <= 0;
+            const inscritosReales = inscritosPorTaller[taller.id] || 0;
+            const cuposDisponibles = taller.capacidadMaxima - inscritosReales;
+            const estaLleno = inscritosReales >= taller.capacidadMaxima;
 
             return (
               <Card
                 key={taller.id}
-                className={`relative transition-all cursor-pointer ${
+                className={`relative transition-all ${
+                  estaLleno && !isSeleccionado
+                    ? 'opacity-50 bg-gray-100 cursor-not-allowed'
+                    : 'cursor-pointer'
+                } ${
                   isSeleccionado
                     ? 'border-2 border-green-500 bg-green-50 shadow-lg scale-105'
-                    : estaLleno
-                    ? 'opacity-60 bg-gray-50'
                     : 'hover:shadow-lg hover:scale-102 border-2 border-transparent'
                 }`}
                 onClick={() => !estaLleno && handleToggleTaller(diaInfo.dia, taller.id)}
@@ -218,7 +264,7 @@ export function SeleccionTalleresPorDia({
                     </div>
                     <Checkbox
                       checked={isSeleccionado}
-                      disabled={estaLleno}
+                      disabled={estaLleno && !isSeleccionado}
                       className="mt-1"
                     />
                   </div>
@@ -231,13 +277,21 @@ export function SeleccionTalleresPorDia({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
-                        {cuposDisponibles} cupos
+                      <span className="text-sm font-medium text-gray-700">
+                        {inscritosReales}/{taller.capacidadMaxima} inscritos
                       </span>
                     </div>
-                    {estaLleno && (
+                    {estaLleno ? (
                       <Badge variant="destructive" className="text-xs">
-                        Lleno
+                        🔒 Lleno
+                      </Badge>
+                    ) : cuposDisponibles <= 3 ? (
+                      <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
+                        ⚠️ {cuposDisponibles} cupos
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                        ✓ Disponible
                       </Badge>
                     )}
                   </div>

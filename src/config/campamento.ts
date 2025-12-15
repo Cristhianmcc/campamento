@@ -2,20 +2,20 @@
 
 export const campamentoConfig = {
   // Información General
-  nombre: "Campamento Esperanza 2025",
-  lema: "Renovando nuestra fe en Cristo",
-  fechas: "15 - 20 de Enero 2025",
-  lugar: "Centro Recreacional Valle Verde, Lima",
+  nombre: "Campamento Juvenil ¡SI, SEÑOR!",
+  lema: "Un llamado que transforma",
+  fechas: "27 - 30 de Enero 2026",
+  lugar: "La Roca Av. Las Palmas",
   
   // Costos
-  precio: "S/ 250.00",
+  precio: "S/ 160.00",
   precioDescripcion: "Incluye alojamiento, alimentación completa y materiales",
   
   // Información de Pago
-  yapeNumero: "+51 987 654 321",
-  yapeTitular: "Iglesia Nueva Vida",
-  plinNumero: "+51 987 654 321",
-  plinTitular: "Iglesia Nueva Vida",
+  yapeNumero: "+51 955 195 324",
+  yapeTitular: "Iglesia La Roca",
+  plinNumero: "+51 955 195 324",
+  plinTitular: "Iglesia La Roca",
   
   // URL de imágenes (puedes cambiar estas URLs)
   imagenHero: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80", // Imagen de banner principal
@@ -32,10 +32,10 @@ export const campamentoConfig = {
   
   // Información de Contacto
   contacto: {
-    email: "campamento@iglesianvida.org",
+    email: "campamento@iglesialaroca.org",
     telefono: "+51 955 195 324",
     whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51955195324", // Solo números, sin + ni espacios
-    direccion: "Av. Principal 123, Lima, Perú",
+    direccion: "Av. Las Palmas, Lima, Perú",
   },
   
   // Sobre el Campamento

@@ -20,6 +20,12 @@ interface PerfilData {
   estadoPago: string;
   fechaInscripcion: string;
   tallerAsignado?: string;
+  talleresPorDia?: {
+    dia1: string[];
+    dia2: string[];
+    dia3: string[];
+    dia4: string[];
+  };
 }
 
 interface MiPerfilProps {
@@ -227,12 +233,59 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
             </Card>
 
             {/* Taller Asignado */}
-            <Card className={perfilData.tallerAsignado ? "border-blue-200 bg-blue-50" : "border-gray-200"}>
+            <Card className={
+              (perfilData.talleresPorDia && Object.values(perfilData.talleresPorDia).some(dia => dia.length > 0)) || 
+              perfilData.tallerAsignado 
+                ? "border-blue-200 bg-blue-50" 
+                : "border-gray-200"
+            }>
               <CardHeader>
-                <CardTitle>Taller Asignado</CardTitle>
+                <CardTitle>Talleres Inscritos</CardTitle>
               </CardHeader>
               <CardContent>
-                {perfilData.tallerAsignado ? (
+                {/* Nuevo sistema: Talleres por día */}
+                {perfilData.talleresPorDia && Object.values(perfilData.talleresPorDia).some(dia => dia.length > 0) ? (
+                  <div className="space-y-6">
+                    {[1, 2, 3, 4].map(diaNum => {
+                      const diaKey = `dia${diaNum}` as keyof typeof perfilData.talleresPorDia;
+                      const talleresDia = perfilData.talleresPorDia![diaKey] || [];
+                      
+                      if (talleresDia.length === 0) return null;
+                      
+                      const diaInfo = campamentoConfig.talleresPorDia.find(d => d.dia === diaNum);
+                      
+                      return (
+                        <div key={diaNum} className="border-l-4 border-blue-500 pl-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Badge className="bg-blue-600">Día {diaNum}</Badge>
+                            <p className="text-sm font-semibold text-gray-700">
+                              {diaInfo?.titulo}
+                            </p>
+                          </div>
+                          <div className="space-y-2">
+                            {talleresDia.map((taller, idx) => (
+                              <div key={idx} className="flex items-start gap-2 bg-white rounded-lg p-3 shadow-sm">
+                                <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="font-semibold text-gray-900">{taller}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <p className="text-sm text-gray-600">
+                        Total de talleres: <span className="font-bold text-blue-900">
+                          {Object.values(perfilData.talleresPorDia).flat().length}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                ) : perfilData.tallerAsignado ? (
+                  /* Sistema antiguo: Un solo taller */
                   <div className="flex items-center gap-3">
                     <div className="bg-blue-600 rounded-full p-3">
                       <Check className="w-6 h-6 text-white" />
@@ -245,6 +298,7 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
                     </div>
                   </div>
                 ) : (
+                  /* No tiene talleres */
                   <div className="flex items-center gap-3 text-gray-500">
                     <X className="w-6 h-6" />
                     <div>
