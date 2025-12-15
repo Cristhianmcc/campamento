@@ -16,6 +16,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
     nombres: "",
     apellidos: "",
     edad: "",
+    sexo: "",
     dni: "",
     email: "",
     telefono: "",
@@ -42,6 +43,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
     if (!formData.edad || parseInt(formData.edad) < 1 || parseInt(formData.edad) > 120) {
       newErrors.edad = "Ingrese una edad válida";
     }
+    if (!formData.sexo) newErrors.sexo = "Selecciona tu sexo";
     if (!formData.dni.trim() || formData.dni.length !== 8) {
       newErrors.dni = "El DNI debe tener 8 dígitos";
     }
@@ -150,6 +152,33 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
               />
               {errors.edad && (
                 <p className="text-red-500 text-sm mt-1">{errors.edad}</p>
+              )}
+            </div>
+
+            {/* Sexo */}
+            <div>
+              <Label htmlFor="sexo" className="flex items-center gap-2 mb-2 text-[#1E3A8A] font-['Inter'] font-medium">
+                <User className="w-4 h-4" />
+                Sexo *
+              </Label>
+              <select
+                id="sexo"
+                name="sexo"
+                value={formData.sexo}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, sexo: e.target.value }));
+                  if (errors.sexo) {
+                    setErrors(prev => ({ ...prev, sexo: "" }));
+                  }
+                }}
+                className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.sexo ? "border-red-500" : ""}`}
+              >
+                <option value="">Selecciona...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+              {errors.sexo && (
+                <p className="text-red-500 text-sm mt-1">{errors.sexo}</p>
               )}
             </div>
 

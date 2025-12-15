@@ -17,6 +17,7 @@ interface PerfilData {
   email: string;
   telefono: string;
   iglesia: string;
+  sexo?: string;
   estadoPago: string;
   fechaInscripcion: string;
   tallerAsignado?: string;
@@ -206,6 +207,27 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
                 <CardTitle>Información Personal</CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="flex flex-col sm:flex-row gap-6 mb-6">
+                  {/* Avatar */}
+                  <div className="flex justify-center sm:justify-start">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#E0B84C] shadow-lg">
+                      <img
+                        src={`https://api.dicebear.com/7.x/${perfilData.sexo === 'F' ? 'avataaars' : 'adventurer'}/svg?seed=${perfilData.dni}&backgroundColor=b6e3f4,c0aede,d1d4f9`}
+                        alt="Avatar"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  </div>
+                  {/* Nombre completo */}
+                  <div className="flex flex-col justify-center text-center sm:text-left">
+                    <h2 className="text-3xl font-bold text-[#1E3A8A] font-['Playfair_Display']">
+                      {perfilData.nombres} {perfilData.apellidos}
+                    </h2>
+                    <p className="text-lg text-[#6B7280] mt-1 font-['Inter']">
+                      {perfilData.edad} años {perfilData.sexo === 'M' ? '👨' : perfilData.sexo === 'F' ? '👩' : ''}
+                    </p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Código de Inscripción</p>

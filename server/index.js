@@ -74,6 +74,7 @@ try {
 
 // Obtener spreadsheetId del archivo .env o configuración
 const SPREADSHEET_ID = process.env.VITE_SPREADSHEET_ID || '1hCbcC82oeY4auvQ6TC4FdmWcfr35Cnw-EJcPg8B8MCg';
+const SPREADSHEET_ID_BACKUP = process.env.VITE_SPREADSHEET_ID_BACKUP || '1Zl1VCEj6igMxlMRMElu2P-jDyx1ChCXLNRlkpd75HxI'; // Sheet de respaldo
 
 // ==================== ENDPOINTS ====================
 
@@ -87,6 +88,7 @@ app.post('/api/inscripciones', async (req, res) => {
       data.nombres,
       data.apellidos,
       data.edad,
+      data.sexo || 'N/A',
       data.dni,
       data.email,
       data.telefono,
@@ -95,24 +97,38 @@ app.post('/api/inscripciones', async (req, res) => {
       data.estadoPago, // "Pendiente" por defecto
       new Date(data.fechaInscripcion).toLocaleString('es-PE', { timeZone: 'America/Lima' }),
       data.fechaConfirmacion || '',
-      '', // Columna M - Ya no se usa (mantener para compatibilidad)
-      '', // Columna N - Ya no se usa
-      '', // Columna O - Día 1 Taller 1
-      '', // Columna P - Día 1 Taller 2
-      '', // Columna Q - Día 2 Taller 1
-      '', // Columna R - Día 2 Taller 2
-      '', // Columna S - Día 3 Taller 1
-      '', // Columna T - Día 3 Taller 2
-      '', // Columna U - Día 4 Taller 1
-      ''  // Columna V - Día 4 Taller 2
+      '', // Columna N - Día 1 Taller 1
+      '', // Columna O - Día 1 Taller 2
+      '', // Columna P - Día 2 Taller 1
+      '', // Columna Q - Día 2 Taller 2
+      '', // Columna R - Día 3 Taller 1
+      '', // Columna S - Día 3 Taller 2
+      '', // Columna T - Día 4 Taller 1
+      ''  // Columna U - Día 4 Taller 2
     ]];
 
+    // Guardar en sheet principal
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:V', // Actualizado a columna V
+      range: 'Inscripciones!A:U',
       valueInputOption: 'USER_ENTERED',
       requestBody: { values }
     });
+
+    // Guardar también en sheet de respaldo si está configurado
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: 'Inscripciones!A:U',
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values }
+        });
+        console.log('✅ Inscripción guardada también en sheet de respaldo');
+      } catch (backupError) {
+        console.error('⚠️ Error al guardar en sheet de respaldo:', backupError.message);
+      }
+    }
 
     res.json({ success: true, message: 'Inscripción guardada' });
   } catch (error) {
@@ -129,16 +145,16 @@ app.get('/api/verificar-dni/:dni', async (req, res) => {
     // Buscar solo en la hoja Inscripciones
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N',
+      range: 'Inscripciones!A:U',
     });
 
     const rows = response.data.values || [];
 
-    // Buscar DNI en columna E (índice 4)
+    // Buscar DNI en columna F (índice 5)
     let existe = false;
     
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][4] === dni) {
+      if (rows[i][5] === dni) {
         existe = true;
         break;
       }
@@ -156,17 +172,18 @@ app.get('/api/verificar-pago/:dni', async (req, res) => {
   try {
     const { dni } = req.params;
 
+    // Buscar primero en sheet principal
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N', // Hoja única
+      range: 'Inscripciones!A:U',
     });
 
     const rows = result.data.values || [];
 
-    // Buscar DNI en columna E (índice 4) Y Estado Pago = "Confirmado" en columna J (índice 9)
+    // Buscar DNI en columna F (índice 5) Y Estado Pago = "Confirmado" en columna K (índice 10)
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row[4] === dni && row[9] === 'Confirmado') {
+      if (row[5] === dni && row[10] === 'Confirmado') {
         return res.json({
           permitido: true,
           datos: {
@@ -174,18 +191,60 @@ app.get('/api/verificar-pago/:dni', async (req, res) => {
             nombres: row[1],
             apellidos: row[2],
             edad: row[3],
-            dni: row[4],
-            email: row[5],
-            telefono: row[6],
-            iglesia: row[7],
-            necesidadesEspeciales: row[8],
-            estadoPago: row[9],
-            fechaInscripcion: row[10],
-            fechaConfirmacion: row[11],
-            tallerAsignado: row[12] || null,
-            fechaRegistroTaller: row[13] || null
+            sexo: row[4],
+            dni: row[5],
+            email: row[6],
+            telefono: row[7],
+            iglesia: row[8],
+            necesidadesEspeciales: row[9],
+            estadoPago: row[10],
+            fechaInscripcion: row[11],
+            fechaConfirmacion: row[12],
+            tallerAsignado: null,
+            fechaRegistroTaller: null
           }
         });
+      }
+    }
+
+    // Si no encontró en el principal, buscar en el sheet de respaldo
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        const resultBackup = await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: 'Inscripciones!A:U',
+        });
+
+        const rowsBackup = resultBackup.data.values || [];
+
+        for (let i = 1; i < rowsBackup.length; i++) {
+          const row = rowsBackup[i];
+          if (row[5] === dni && row[10] === 'Confirmado') {
+            console.log('✅ Pago confirmado encontrado en sheet de respaldo');
+            return res.json({
+              permitido: true,
+              datos: {
+                codigoInscripcion: row[0],
+                nombres: row[1],
+                apellidos: row[2],
+                edad: row[3],
+                sexo: row[4],
+                dni: row[5],
+                email: row[6],
+                telefono: row[7],
+                iglesia: row[8],
+                necesidadesEspeciales: row[9],
+                estadoPago: row[10],
+                fechaInscripcion: row[11],
+                fechaConfirmacion: row[12],
+                tallerAsignado: null,
+                fechaRegistroTaller: null
+              }
+            });
+          }
+        }
+      } catch (backupError) {
+        console.error('⚠️ Error al verificar en sheet de respaldo:', backupError.message);
       }
     }
 
@@ -203,25 +262,50 @@ app.get('/api/verificar-taller/:dni', async (req, res) => {
 
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:V', // Incluir nuevas columnas
+      range: 'Inscripciones!A:U', // Incluir nuevas columnas
     });
 
     const rows = result.data.values || [];
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row[4] === dni) {
-        const tieneTallerAntiguo = row[12] && row[12] !== '';
-        
-        // Verificar también columnas O-V (sistema nuevo de talleres por día)
-        const talleresNuevos = row.slice(14, 22); // columnas O-V
+      if (row[5] === dni) {
+        // Verificar columnas N-U (sistema de talleres por día)
+        const talleresNuevos = row.slice(13, 21); // columnas N-U
         const tieneTalleresNuevos = talleresNuevos && talleresNuevos.some(t => t && t.trim() !== '');
         
-        const tieneTaller = tieneTallerAntiguo || tieneTalleresNuevos;
+        const tieneTaller = tieneTalleresNuevos;
         return res.json({ 
           tieneTaller,
           talleresRegistrados: tieneTalleresNuevos ? talleresNuevos : null
         });
+      }
+    }
+
+    // Si no encontró en el principal, buscar en el sheet de respaldo
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        const resultBackup = await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: 'Inscripciones!A:U',
+        });
+
+        const rowsBackup = resultBackup.data.values || [];
+
+        for (let i = 1; i < rowsBackup.length; i++) {
+          const row = rowsBackup[i];
+          if (row[5] === dni) {
+            const talleresNuevos = row.slice(13, 21);
+            const tieneTalleresNuevos = talleresNuevos && talleresNuevos.some(t => t && t.trim() !== '');
+            
+            return res.json({ 
+              tieneTaller: tieneTalleresNuevos,
+              talleresRegistrados: tieneTalleresNuevos ? talleresNuevos : null
+            });
+          }
+        }
+      } catch (backupError) {
+        console.error('⚠️ Error al verificar talleres en sheet de respaldo:', backupError.message);
       }
     }
 
@@ -240,14 +324,14 @@ app.post('/api/registrar-taller', async (req, res) => {
     // Buscar la fila del usuario
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:N', // Hoja única
+      range: 'Inscripciones!A:U', // Hoja única
     });
 
     const rows = result.data.values || [];
     let rowIndex = -1;
 
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][4] === dni) {
+      if (rows[i][5] === dni) {
         rowIndex = i + 1; // +1 porque Sheets empieza en 1
         break;
       }
@@ -257,10 +341,10 @@ app.post('/api/registrar-taller', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
 
-    // Actualizar columnas M y N
+    // Actualizar columnas N y O
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `Inscripciones!M${rowIndex}:N${rowIndex}`, // Hoja única
+      range: `Inscripciones!N${rowIndex}:O${rowIndex}`, // Hoja única
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [[
@@ -290,7 +374,7 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
     // Buscar la fila del usuario
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:V',
+      range: 'Inscripciones!A:U',
     });
 
     const rows = result.data.values || [];
@@ -298,7 +382,7 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
     let filaUsuario = null;
 
     for (let i = 1; i < rows.length; i++) {
-      if (rows[i][4] === dni) {
+      if (rows[i][5] === dni) {
         rowIndex = i + 1;
         filaUsuario = rows[i];
         break;
@@ -309,8 +393,8 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
     }
 
-    // VERIFICAR SI YA TIENE TALLERES REGISTRADOS (columnas O-V, índices 14-21)
-    const talleresExistentes = filaUsuario.slice(14, 22); // columnas O-V
+    // VERIFICAR SI YA TIENE TALLERES REGISTRADOS (columnas N-U, índices 13-20)
+    const talleresExistentes = filaUsuario.slice(13, 21); // columnas N-U
     const tieneAlgunTaller = talleresExistentes.some(t => t && t.trim() !== '');
     
     if (tieneAlgunTaller) {
@@ -344,15 +428,32 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
       }
     });
 
-    // Actualizar columnas O a V (índices 14 a 21 en la hoja)
+    // Actualizar columnas N a U en sheet principal
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `Inscripciones!O${rowIndex}:V${rowIndex}`,
+      range: `Inscripciones!N${rowIndex}:U${rowIndex}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [talleresPorColumna]
       }
     });
+
+    // Actualizar también en sheet de respaldo si está configurado
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: `Inscripciones!N${rowIndex}:U${rowIndex}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values: [talleresPorColumna]
+          }
+        });
+        console.log('✅ Talleres guardados también en sheet de respaldo');
+      } catch (backupError) {
+        console.error('⚠️ Error al guardar talleres en sheet de respaldo:', backupError.message);
+      }
+    }
 
     console.log(`✅ Talleres registrados para DNI ${dni}:`, talleresPorColumna);
     res.json({ success: true, message: 'Talleres registrados exitosamente' });
@@ -370,7 +471,7 @@ app.get('/api/cupos-talleres', async (req, res) => {
     // Obtener todas las inscripciones
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:V',
+      range: 'Inscripciones!A:U',
     });
 
     const rows = result.data.values || [];
@@ -390,9 +491,9 @@ app.get('/api/cupos-talleres', async (req, res) => {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       
-      // Leer columnas O-V (índices 14-21)
-      // O=Día1-T1, P=Día1-T2, Q=Día2-T1, R=Día2-T2, S=Día3-T1, T=Día3-T2, U=Día4-T1, V=Día4-T2
-      const talleres = row.slice(14, 22);
+      // Leer columnas N-U (índices 13-20)
+      // N=Día1-T1, O=Día1-T2, P=Día2-T1, Q=Día2-T2, R=Día3-T1, S=Día3-T2, T=Día4-T1, U=Día4-T2
+      const talleres = row.slice(13, 21);
       
       talleres.forEach(nombreTaller => {
         if (nombreTaller && nombreTaller.trim() !== '') {
@@ -422,21 +523,21 @@ app.get('/api/perfil/:dni', async (req, res) => {
 
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Inscripciones!A:V', // Incluir columnas de talleres
+      range: 'Inscripciones!A:U', // Incluir columnas de talleres
     });
 
     const rows = result.data.values || [];
 
-    // Buscar DNI en columna E (índice 4)
+    // Buscar DNI en columna F (índice 5)
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row[4] === dni) {
-        // Extraer talleres de columnas O-V (índices 14-21)
+      if (row[5] === dni) {
+        // Extraer talleres de columnas N-U (índices 13-20)
         const talleresPorDia = {
-          dia1: [row[14] || null, row[15] || null].filter(t => t),
-          dia2: [row[16] || null, row[17] || null].filter(t => t),
-          dia3: [row[18] || null, row[19] || null].filter(t => t),
-          dia4: [row[20] || null, row[21] || null].filter(t => t)
+          dia1: [row[13] || null, row[14] || null].filter(t => t),
+          dia2: [row[15] || null, row[16] || null].filter(t => t),
+          dia3: [row[17] || null, row[18] || null].filter(t => t),
+          dia4: [row[19] || null, row[20] || null].filter(t => t)
         };
         
         return res.json({
@@ -446,16 +547,63 @@ app.get('/api/perfil/:dni', async (req, res) => {
             nombres: row[1],
             apellidos: row[2],
             edad: row[3],
-            dni: row[4],
-            email: row[5],
-            telefono: row[6],
-            iglesia: row[7],
-            estadoPago: row[9] || 'Pendiente',
-            fechaInscripcion: row[10],
-            tallerAsignado: row[12] || null, // Sistema antiguo (mantener compatibilidad)
+            sexo: row[4],
+            dni: row[5],
+            email: row[6],
+            telefono: row[7],
+            iglesia: row[8],
+            estadoPago: row[10] || 'Pendiente',
+            fechaInscripcion: row[11],
+            tallerAsignado: null,
             talleresPorDia // Sistema nuevo
           }
         });
+      }
+    }
+
+    // Si no encontró en el principal, buscar en el sheet de respaldo
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        const resultBackup = await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: 'Inscripciones!A:U',
+        });
+
+        const rowsBackup = resultBackup.data.values || [];
+
+        for (let i = 1; i < rowsBackup.length; i++) {
+          const row = rowsBackup[i];
+          if (row[5] === dni) {
+            const talleresPorDia = {
+              dia1: [row[13] || null, row[14] || null].filter(t => t),
+              dia2: [row[15] || null, row[16] || null].filter(t => t),
+              dia3: [row[17] || null, row[18] || null].filter(t => t),
+              dia4: [row[19] || null, row[20] || null].filter(t => t)
+            };
+            
+            console.log('✅ Perfil encontrado en sheet de respaldo');
+            return res.json({
+              encontrado: true,
+              datos: {
+                codigo: row[0],
+                nombres: row[1],
+                apellidos: row[2],
+                edad: row[3],
+                sexo: row[4],
+                dni: row[5],
+                email: row[6],
+                telefono: row[7],
+                iglesia: row[8],
+                estadoPago: row[10] || 'Pendiente',
+                fechaInscripcion: row[11],
+                tallerAsignado: null,
+                talleresPorDia
+              }
+            });
+          }
+        }
+      } catch (backupError) {
+        console.error('⚠️ Error al obtener perfil de sheet de respaldo:', backupError.message);
       }
     }
 

@@ -258,6 +258,7 @@ export type InscripcionData = {
   nombres: string;
   apellidos: string;
   edad: string;
+  sexo: string;
   dni: string;
   email: string;
   telefono: string;
