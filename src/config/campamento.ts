@@ -19,7 +19,7 @@ export const campamentoConfig = {
   
   // URL de imágenes (puedes cambiar estas URLs)
   imagenHero: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80", // Imagen de banner principal
-  imagenQRYape: "src/img/qr.jpeg", // Reemplazar con QR real de YAPE
+  imagenQRYape: "/qr.jpeg", // QR de YAPE (en carpeta public)
   imagenQRPlin: "https://images.unsplash.com/photo-1609356767591-002b28e37b09?w=400&q=80", // Reemplazar con QR real de PLIN
   
   // Google Sheets - Configuración para almacenar inscripciones
