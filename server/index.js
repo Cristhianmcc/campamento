@@ -118,13 +118,23 @@ app.post('/api/inscripciones', async (req, res) => {
     // Guardar también en sheet de respaldo si está configurado
     if (SPREADSHEET_ID_BACKUP) {
       try {
-        await sheets.spreadsheets.values.append({
+        // Obtener la última fila con datos en el sheet de backup para insertar correctamente
+        const backupData = await sheets.spreadsheets.values.get({
           spreadsheetId: SPREADSHEET_ID_BACKUP,
-          range: 'Inscripciones!A:U',
+          range: 'Inscripciones!A:A', // Solo columna A para encontrar la última fila
+        });
+        
+        const backupRows = backupData.data.values || [];
+        const nextRow = backupRows.length + 1; // La siguiente fila después de la última con datos
+        
+        // Insertar en la fila específica del backup
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: `Inscripciones!A${nextRow}:U${nextRow}`,
           valueInputOption: 'USER_ENTERED',
           requestBody: { values }
         });
-        console.log('✅ Inscripción guardada también en sheet de respaldo');
+        console.log(`✅ Inscripción guardada también en sheet de respaldo (fila ${nextRow})`);
       } catch (backupError) {
         console.error('⚠️ Error al guardar en sheet de respaldo:', backupError.message);
       }
@@ -354,6 +364,44 @@ app.post('/api/registrar-taller', async (req, res) => {
       }
     });
 
+    // Actualizar también en sheet de respaldo si está configurado
+    if (SPREADSHEET_ID_BACKUP) {
+      try {
+        // Buscar la fila del usuario en el sheet de respaldo de forma INDEPENDIENTE
+        const backupResult = await sheets.spreadsheets.values.get({
+          spreadsheetId: SPREADSHEET_ID_BACKUP,
+          range: 'Inscripciones!A:U',
+        });
+
+        const backupRows = backupResult.data.values || [];
+        let backupRowIndex = -1;
+
+        for (let i = 1; i < backupRows.length; i++) {
+          if (backupRows[i][5] === dni) {
+            backupRowIndex = i + 1;
+            break;
+          }
+        }
+
+        if (backupRowIndex !== -1) {
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID_BACKUP,
+            range: `Inscripciones!N${backupRowIndex}:O${backupRowIndex}`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: {
+              values: [[
+                tallerId,
+                new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })
+              ]]
+            }
+          });
+          console.log(`✅ Taller guardado también en sheet de respaldo (fila ${backupRowIndex})`);
+        }
+      } catch (backupError) {
+        console.error('⚠️ Error al guardar taller en sheet de respaldo:', backupError.message);
+      }
+    }
+
     res.json({ success: true, message: 'Registrado en taller' });
   } catch (error) {
     console.error('Error al registrar en taller:', error);
@@ -441,15 +489,35 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
     // Actualizar también en sheet de respaldo si está configurado
     if (SPREADSHEET_ID_BACKUP) {
       try {
-        await sheets.spreadsheets.values.update({
+        // Buscar la fila del usuario en el sheet de respaldo de forma INDEPENDIENTE
+        const backupResult = await sheets.spreadsheets.values.get({
           spreadsheetId: SPREADSHEET_ID_BACKUP,
-          range: `Inscripciones!N${rowIndex}:U${rowIndex}`,
-          valueInputOption: 'USER_ENTERED',
-          requestBody: {
-            values: [talleresPorColumna]
-          }
+          range: 'Inscripciones!A:U',
         });
-        console.log('✅ Talleres guardados también en sheet de respaldo');
+
+        const backupRows = backupResult.data.values || [];
+        let backupRowIndex = -1;
+
+        for (let i = 1; i < backupRows.length; i++) {
+          if (backupRows[i][5] === dni) { // Columna F (índice 5) es el DNI
+            backupRowIndex = i + 1;
+            break;
+          }
+        }
+
+        if (backupRowIndex !== -1) {
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID_BACKUP,
+            range: `Inscripciones!N${backupRowIndex}:U${backupRowIndex}`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: {
+              values: [talleresPorColumna]
+            }
+          });
+          console.log(`✅ Talleres guardados también en sheet de respaldo (fila ${backupRowIndex})`);
+        } else {
+          console.warn(`⚠️ Usuario ${dni} no encontrado en sheet de respaldo`);
+        }
       } catch (backupError) {
         console.error('⚠️ Error al guardar talleres en sheet de respaldo:', backupError.message);
       }
