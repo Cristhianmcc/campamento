@@ -9,7 +9,8 @@ import { InscripcionData } from "../config/campamento";
  * Backend desplegado en Render
  */
 
-const API_URL = 'http://localhost:3002/api'; // Cambiar a Render en producción
+// Usar variable de entorno o localhost como fallback
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
 export class GoogleSheetsService {
   constructor() {
