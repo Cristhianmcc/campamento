@@ -670,6 +670,8 @@ app.get('/api/perfil/:dni', async (req, res) => {
             });
           }
         }
+        
+        console.log('ℹ️ Usuario no encontrado en sheet de respaldo');
       } catch (backupError) {
         console.error('⚠️ Error al obtener perfil de sheet de respaldo:', backupError.message);
       }

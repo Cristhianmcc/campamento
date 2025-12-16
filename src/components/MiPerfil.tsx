@@ -210,9 +210,9 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
                 <div className="flex flex-col sm:flex-row gap-6 mb-6">
                   {/* Avatar */}
                   <div className="flex justify-center sm:justify-start">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#E0B84C] shadow-lg">
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#E0B84C] shadow-lg">
                       <img
-                        src={`https://api.dicebear.com/7.x/${perfilData.sexo === 'F' ? 'avataaars' : 'adventurer'}/svg?seed=${perfilData.dni}&backgroundColor=b6e3f4,c0aede,d1d4f9`}
+                        src={`https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${perfilData.dni}`}
                         alt="Avatar"
                         className="w-full h-full"
                       />
