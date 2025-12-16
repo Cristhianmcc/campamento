@@ -78,12 +78,12 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
     if (isMobile && navigator.share && navigator.canShare) {
       try {
         const shareData = {
-          files: [capturaFile],
+          files: capturaFile ? [capturaFile] : [],
           text: mensaje,
         };
 
         // Verificar si se puede compartir archivos
-        if (navigator.canShare(shareData)) {
+        if (capturaFile && navigator.canShare(shareData)) {
           await navigator.share(shareData);
           
           toast.success("Comprobante compartido", {

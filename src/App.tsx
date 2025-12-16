@@ -4,10 +4,8 @@ import { AcercaDelCampamento } from "./components/AcercaDelCampamento";
 import { FormularioInscripcion } from "./components/FormularioInscripcion";
 import { ModalPago } from "./components/ModalPago";
 import { TalleresAcceso } from "./components/TalleresAcceso";
-import { SeleccionTaller } from "./components/SeleccionTaller";
 import { SeleccionTalleresPorDia } from "./components/SeleccionTalleresPorDia";
 import { MiPerfil } from "./components/MiPerfil";
-import { Footer } from "./components/Footer";
 import { googleSheetsService } from "./services/googleSheets";
 import { InscripcionData } from "./config/campamento";
 import { Toaster, toast } from "sonner";
@@ -87,24 +85,24 @@ export default function App() {
     }
   };
 
-  // Sistema anterior - mantener por compatibilidad
-  const handleRegistrarEnTaller = async (dni: string, tallerId: string) => {
-    const resultado = await googleSheetsService.registrarEnTaller(dni, tallerId);
-    
-    if (resultado) {
-      try {
-        const API_URL = 'http://localhost:3002/api';
-        await fetch(`${API_URL}/sincronizar-talleres`, {
-          method: 'POST'
-        });
-        console.log('✅ Talleres sincronizados automáticamente');
-      } catch (error) {
-        console.warn('⚠️ No se pudo sincronizar talleres automáticamente:', error);
-      }
-    }
-    
-    return resultado;
-  };
+  // Sistema anterior - mantener por compatibilidad (función comentada por no uso)
+  // const handleRegistrarEnTaller = async (dni: string, tallerId: string) => {
+  //   const resultado = await googleSheetsService.registrarEnTaller(dni, tallerId);
+  //   
+  //   if (resultado) {
+  //     try {
+  //       const API_URL = 'http://localhost:3002/api';
+  //       await fetch(`${API_URL}/sincronizar-talleres`, {
+  //         method: 'POST'
+  //       });
+  //       console.log('✅ Talleres sincronizados automáticamente');
+  //     } catch (error) {
+  //       console.warn('⚠️ No se pudo sincronizar talleres automáticamente:', error);
+  //     }
+  //   }
+  //   
+  //   return resultado;
+  // };
 
   // NUEVO SISTEMA: Registrar múltiples talleres por día
   const handleRegistrarTalleresPorDia = async (dni: string, talleres: Array<{ dia: number, talleres: string[] }>) => {

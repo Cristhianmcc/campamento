@@ -1,5 +1,4 @@
 import { campamentoConfig } from "../config/campamento";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Calendar, MapPin, ChevronDown, Edit3, Users, UserCircle } from "lucide-react";
 
 interface HeroSectionProps {
