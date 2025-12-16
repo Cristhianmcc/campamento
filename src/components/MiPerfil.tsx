@@ -210,7 +210,7 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
                 <div className="flex flex-col sm:flex-row gap-6 mb-6">
                   {/* Avatar */}
                   <div className="flex justify-center sm:justify-start">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#E0B84C] shadow-lg">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-[#E0B84C] shadow-lg">
                       <img
                         src={`https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${perfilData.dni}`}
                         alt="Avatar"
