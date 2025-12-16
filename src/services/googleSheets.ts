@@ -9,8 +9,11 @@ import { InscripcionData } from "../config/campamento";
  * Backend desplegado en Render
  */
 
-// Usar variable de entorno o localhost como fallback
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+// Detectar automáticamente el entorno
+const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = isLocalDevelopment 
+  ? 'http://localhost:3002/api' 
+  : 'https://campamento-nz0r.onrender.com/api';
 
 export class GoogleSheetsService {
   constructor() {
