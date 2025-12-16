@@ -253,7 +253,7 @@ export function FormularioInscripcion({ onSubmit, isSubmitting }: FormularioInsc
               name="iglesia"
               value={formData.iglesia}
               onChange={handleChange}
-              placeholder="Iglesia Cristiana Nueva Vida"
+              placeholder="Iglesia Cristiana La Roca"
               className={errors.iglesia ? "border-red-500" : ""}
             />
             {errors.iglesia && (
