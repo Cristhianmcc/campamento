@@ -61,17 +61,19 @@ export function MiPerfil({ onVolver, verificarDatos }: MiPerfilProps) {
       const datos = await verificarDatos(dni);
       
       if (datos) {
-        setPerfilData(datos);
-        
-        // Mostrar mensaje específico según el estado de pago
-        if (datos.estadoPago === "Confirmado") {
-          toast.success("Datos cargados correctamente");
-        } else {
-          toast.info("Inscripción encontrada", {
-            description: "Tu pago aún está pendiente de confirmación",
-            duration: 6000,
+        // Verificar si el pago está confirmado
+        if (datos.estadoPago !== "Confirmado") {
+          toast.error("Pago no confirmado", {
+            description: "Tu inscripción existe pero el pago aún no ha sido confirmado. Por favor espera la confirmación del organizador.",
+            duration: 7000,
           });
+          setPerfilData(null);
+          return;
         }
+        
+        // Solo mostrar datos si el pago está confirmado
+        setPerfilData(datos);
+        toast.success("Datos cargados correctamente");
       } else {
         toast.error("No se encontró inscripción", {
           description: "Verifica que tu DNI sea correcto o regístrate primero",
