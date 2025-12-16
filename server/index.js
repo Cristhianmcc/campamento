@@ -649,7 +649,7 @@ app.get('/api/perfil/:dni', async (req, res) => {
       }
     }
 
-    // Si no encontró en el principal, buscar en el sheet de respaldo
+    // Consultar también el sheet de respaldo para obtener estado de pago actualizado
     if (SPREADSHEET_ID_BACKUP) {
       try {
         const resultBackup = await sheets.spreadsheets.values.get({
@@ -662,38 +662,54 @@ app.get('/api/perfil/:dni', async (req, res) => {
         for (let i = 1; i < rowsBackup.length; i++) {
           const row = rowsBackup[i];
           if (row[5] === dni) {
-            const talleresPorDia = {
-              dia1: [row[13] || null, row[14] || null].filter(t => t),
-              dia2: [row[15] || null, row[16] || null].filter(t => t),
-              dia3: [row[17] || null, row[18] || null].filter(t => t),
-              dia4: [row[19] || null, row[20] || null].filter(t => t)
-            };
+            const estadoPagoBackup = row[10];
+            const fechaConfirmacionBackup = row[12];
             
-            console.log('✅ Perfil encontrado en sheet de respaldo');
-            return res.json({
-              encontrado: true,
-              datos: {
-                codigo: row[0],
-                nombres: row[1],
-                apellidos: row[2],
-                edad: row[3],
-                sexo: row[4],
-                dni: row[5],
-                email: row[6],
-                telefono: row[7],
-                iglesia: row[8],
-                estadoPago: row[10] || 'Pendiente',
-                fechaInscripcion: row[11],
-                tallerAsignado: null,
-                talleresPorDia
+            // Si el backup tiene el pago confirmado, actualizar la info del usuario
+            if (estadoPagoBackup === 'Confirmado') {
+              console.log('✅ Estado de pago actualizado desde backup: Confirmado');
+              
+              // Si ya se encontró en el principal, actualizar solo el estado de pago
+              if (result.data.values && result.data.values.length > 1) {
+                for (let j = 1; j < result.data.values.length; j++) {
+                  const mainRow = result.data.values[j];
+                  if (mainRow[5] === dni) {
+                    const talleresPorDia = {
+                      dia1: [mainRow[13] || null, mainRow[14] || null].filter(t => t),
+                      dia2: [mainRow[15] || null, mainRow[16] || null].filter(t => t),
+                      dia3: [mainRow[17] || null, mainRow[18] || null].filter(t => t),
+                      dia4: [mainRow[19] || null, mainRow[20] || null].filter(t => t)
+                    };
+                    
+                    return res.json({
+                      encontrado: true,
+                      datos: {
+                        codigo: mainRow[0],
+                        nombres: mainRow[1],
+                        apellidos: mainRow[2],
+                        edad: mainRow[3],
+                        sexo: mainRow[4],
+                        dni: mainRow[5],
+                        email: mainRow[6],
+                        telefono: mainRow[7],
+                        iglesia: mainRow[8],
+                        estadoPago: 'Confirmado', // Usar estado del backup
+                        fechaInscripcion: mainRow[11],
+                        fechaConfirmacion: fechaConfirmacionBackup || mainRow[12],
+                        tallerAsignado: null,
+                        talleresPorDia
+                      }
+                    });
+                  }
+                }
               }
-            });
+            }
+            
+            break;
           }
         }
-        
-        console.log('ℹ️ Usuario no encontrado en sheet de respaldo');
       } catch (backupError) {
-        console.error('⚠️ Error al obtener perfil de sheet de respaldo:', backupError.message);
+        console.error('⚠️ Error al consultar sheet de respaldo:', backupError.message);
       }
     }
 
