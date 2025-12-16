@@ -609,14 +609,16 @@ app.get('/api/perfil/:dni', async (req, res) => {
   try {
     const { dni } = req.params;
 
+    // Consultar sheet principal
     const result = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: 'Inscripciones!A:U', // Incluir columnas de talleres
     });
 
     const rows = result.data.values || [];
+    let datosUsuario = null;
 
-    // Buscar DNI en columna F (índice 5)
+    // Buscar DNI en columna F (índice 5) del sheet principal
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (row[5] === dni) {
@@ -628,28 +630,34 @@ app.get('/api/perfil/:dni', async (req, res) => {
           dia4: [row[19] || null, row[20] || null].filter(t => t)
         };
         
-        return res.json({
-          encontrado: true,
-          datos: {
-            codigo: row[0],
-            nombres: row[1],
-            apellidos: row[2],
-            edad: row[3],
-            sexo: row[4],
-            dni: row[5],
-            email: row[6],
-            telefono: row[7],
-            iglesia: row[8],
-            estadoPago: row[10] || 'Pendiente',
-            fechaInscripcion: row[11],
-            tallerAsignado: null,
-            talleresPorDia // Sistema nuevo
-          }
-        });
+        datosUsuario = {
+          codigo: row[0],
+          nombres: row[1],
+          apellidos: row[2],
+          edad: row[3],
+          sexo: row[4],
+          dni: row[5],
+          email: row[6],
+          telefono: row[7],
+          iglesia: row[8],
+          estadoPago: row[10] || 'Pendiente',
+          fechaInscripcion: row[11],
+          fechaConfirmacion: row[12] || '',
+          tallerAsignado: null,
+          talleresPorDia
+        };
+        
+        console.log('📋 Usuario encontrado en sheet principal, estado:', datosUsuario.estadoPago);
+        break;
       }
     }
 
-    // Consultar también el sheet de respaldo para obtener estado de pago actualizado
+    // Si no se encontró en el principal, retornar no encontrado
+    if (!datosUsuario) {
+      return res.json({ encontrado: false, datos: null });
+    }
+
+    // Consultar el sheet de respaldo para verificar estado de pago
     if (SPREADSHEET_ID_BACKUP) {
       try {
         const resultBackup = await sheets.spreadsheets.values.get({
@@ -665,44 +673,13 @@ app.get('/api/perfil/:dni', async (req, res) => {
             const estadoPagoBackup = row[10];
             const fechaConfirmacionBackup = row[12];
             
-            // Si el backup tiene el pago confirmado, actualizar la info del usuario
+            console.log('🔍 Estado de pago en backup:', estadoPagoBackup);
+            
+            // Si el backup tiene el pago confirmado, usar ese estado
             if (estadoPagoBackup === 'Confirmado') {
-              console.log('✅ Estado de pago actualizado desde backup: Confirmado');
-              
-              // Si ya se encontró en el principal, actualizar solo el estado de pago
-              if (result.data.values && result.data.values.length > 1) {
-                for (let j = 1; j < result.data.values.length; j++) {
-                  const mainRow = result.data.values[j];
-                  if (mainRow[5] === dni) {
-                    const talleresPorDia = {
-                      dia1: [mainRow[13] || null, mainRow[14] || null].filter(t => t),
-                      dia2: [mainRow[15] || null, mainRow[16] || null].filter(t => t),
-                      dia3: [mainRow[17] || null, mainRow[18] || null].filter(t => t),
-                      dia4: [mainRow[19] || null, mainRow[20] || null].filter(t => t)
-                    };
-                    
-                    return res.json({
-                      encontrado: true,
-                      datos: {
-                        codigo: mainRow[0],
-                        nombres: mainRow[1],
-                        apellidos: mainRow[2],
-                        edad: mainRow[3],
-                        sexo: mainRow[4],
-                        dni: mainRow[5],
-                        email: mainRow[6],
-                        telefono: mainRow[7],
-                        iglesia: mainRow[8],
-                        estadoPago: 'Confirmado', // Usar estado del backup
-                        fechaInscripcion: mainRow[11],
-                        fechaConfirmacion: fechaConfirmacionBackup || mainRow[12],
-                        tallerAsignado: null,
-                        talleresPorDia
-                      }
-                    });
-                  }
-                }
-              }
+              console.log('✅ Actualizando estado de pago desde backup: Confirmado');
+              datosUsuario.estadoPago = 'Confirmado';
+              datosUsuario.fechaConfirmacion = fechaConfirmacionBackup || datosUsuario.fechaConfirmacion;
             }
             
             break;
@@ -713,7 +690,11 @@ app.get('/api/perfil/:dni', async (req, res) => {
       }
     }
 
-    res.json({ encontrado: false, datos: null });
+    // Retornar datos con el estado de pago correcto (del backup si está confirmado ahí)
+    return res.json({
+      encontrado: true,
+      datos: datosUsuario
+    });
   } catch (error) {
     console.error('Error al obtener perfil:', error);
     res.status(500).json({ success: false, error: error.message });
