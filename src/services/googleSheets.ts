@@ -6,14 +6,17 @@ import { InscripcionData } from "../config/campamento";
  * Este servicio se conecta a un backend Node.js que maneja
  * la autenticación con Google Sheets usando Service Account.
  * 
- * Backend desplegado en Render
+ * Backend desplegado en Koyeb (producción)
+ * Fallback disponible: Render
  */
 
 // Detectar automáticamente el entorno
 const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const API_URL = isLocalDevelopment 
   ? 'http://localhost:3002/api' 
-  : 'https://campamento-nz0r.onrender.com/api';
+  : 'https://screeching-marcie-laroca-b9daacc1.koyeb.app/api';
+
+console.log('🌐 Conectando al backend:', API_URL);
 
 export class GoogleSheetsService {
   constructor() {
