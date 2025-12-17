@@ -44,6 +44,12 @@ export default function EstadisticasTalleres() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Detectar automáticamente el entorno
+  const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const API_URL = isLocalDevelopment 
+    ? 'http://localhost:3002/api' 
+    : 'https://screeching-marcie-laroca-b9daacc1.koyeb.app/api';
+
   useEffect(() => {
     cargarEstadisticas();
   }, []);
@@ -51,7 +57,7 @@ export default function EstadisticasTalleres() {
   const cargarEstadisticas = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3002/api/estadisticas-talleres');
+      const response = await fetch(`${API_URL}/estadisticas-talleres`);
       const data = await response.json();
       
       if (data.success) {
