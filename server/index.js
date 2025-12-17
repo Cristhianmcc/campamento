@@ -506,6 +506,89 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
       }
     });
 
+    // ==================== NUEVA FUNCIONALIDAD: AGREGAR A HOJAS DE TALLERES ====================
+    // Obtener datos completos del usuario
+    // Columnas: A=Código, B=Nombres, C=Apellidos, D=Edad, E=Sexo, F=DNI, G=Email, H=Teléfono, I=Iglesia
+    const datosUsuario = {
+      codigo: filaUsuario[0],
+      nombres: filaUsuario[1],
+      apellidos: filaUsuario[2],
+      edad: filaUsuario[3],
+      sexo: filaUsuario[4] || '',   // Columna E
+      dni: filaUsuario[5],  // Columna F
+      email: filaUsuario[6],  // Columna G
+      telefono: filaUsuario[7], // Columna H
+      iglesia: filaUsuario[8],  // Columna I
+      fechaRegistro: new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })
+    };
+
+    // Función auxiliar para agregar usuario a hoja de taller
+    const agregarAHojaTaller = async (spreadsheetId, nombreTaller, datosUsuario) => {
+      try {
+        // Verificar si la hoja existe, si no, crearla
+        const sheetInfo = await sheets.spreadsheets.get({ spreadsheetId });
+        const hojasExistentes = sheetInfo.data.sheets.map(s => s.properties.title);
+        
+        if (!hojasExistentes.includes(nombreTaller)) {
+          // Crear la hoja del taller
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId,
+            requestBody: {
+              requests: [{
+                addSheet: {
+                  properties: { title: nombreTaller }
+                }
+              }]
+            }
+          });
+          
+          // Agregar encabezados
+          const encabezados = [['Código', 'Nombres', 'Apellidos', 'Edad', 'Sexo', 'DNI', 'Email', 'Teléfono', 'Iglesia', 'Fecha Registro']];
+          await sheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: `${nombreTaller}!A1:J1`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: { values: encabezados }
+          });
+          
+          console.log(`📄 Hoja creada: ${nombreTaller}`);
+        }
+        
+        // Agregar los datos del usuario a la hoja del taller
+        const fila = [[
+          datosUsuario.codigo,
+          datosUsuario.nombres,
+          datosUsuario.apellidos,
+          datosUsuario.edad,
+          datosUsuario.sexo,
+          datosUsuario.dni,
+          datosUsuario.email,
+          datosUsuario.telefono,
+          datosUsuario.iglesia,
+          datosUsuario.fechaRegistro
+        ]];
+        
+        await sheets.spreadsheets.values.append({
+          spreadsheetId,
+          range: `${nombreTaller}!A:J`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: fila }
+        });
+        
+        console.log(`✅ Usuario agregado a hoja: ${nombreTaller}`);
+      } catch (error) {
+        console.error(`⚠️ Error al agregar usuario a hoja ${nombreTaller}:`, error.message);
+      }
+    };
+
+    // Agregar a hojas de talleres en sheet principal
+    for (let i = 0; i < talleresPorColumna.length; i++) {
+      const nombreTaller = talleresPorColumna[i];
+      if (nombreTaller && nombreTaller.trim() !== '') {
+        await agregarAHojaTaller(SPREADSHEET_ID, nombreTaller, datosUsuario);
+      }
+    }
+
     // Actualizar también en sheet de respaldo si está configurado
     if (SPREADSHEET_ID_BACKUP) {
       try {
@@ -535,6 +618,14 @@ app.post('/api/registrar-talleres-por-dia', async (req, res) => {
             }
           });
           console.log(`✅ Talleres guardados también en sheet de respaldo (fila ${backupRowIndex})`);
+          
+          // Agregar a hojas de talleres en sheet de respaldo
+          for (let i = 0; i < talleresPorColumna.length; i++) {
+            const nombreTaller = talleresPorColumna[i];
+            if (nombreTaller && nombreTaller.trim() !== '') {
+              await agregarAHojaTaller(SPREADSHEET_ID_BACKUP, nombreTaller, datosUsuario);
+            }
+          }
         } else {
           console.warn(`⚠️ Usuario ${dni} no encontrado en sheet de respaldo`);
         }
