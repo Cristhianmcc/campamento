@@ -937,8 +937,214 @@ const server = app.listen(PORT, () => {
   console.log(`  GET    http://localhost:${PORT}/api/cupos-talleres`);
   console.log(`  GET    http://localhost:${PORT}/api/perfil/:dni`);
   console.log(`  POST   http://localhost:${PORT}/api/sincronizar-talleres`);
+  console.log('  GET    http://localhost:' + PORT + '/api/estadisticas-talleres');
   console.log('');
   console.log('⏳ Esperando peticiones...');
+});
+
+// 8. Obtener estadísticas completas de talleres
+app.get('/api/estadisticas-talleres', async (req, res) => {
+  try {
+    console.log('📊 Generando estadísticas de talleres...');
+    
+    // Obtener todas las inscripciones
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Inscripciones!A:U',
+    });
+
+    const rows = result.data.values || [];
+    
+    if (rows.length <= 1) {
+      return res.json({
+        success: true,
+        estadisticas: {
+          resumen: {
+            totalInscritos: 0,
+            personasConTalleres: 0,
+            personasSinTalleres: 0,
+            porcentajeConTalleres: '0.0',
+            cupoMaximoPorTaller: 40
+          },
+          talleresDetallado: {},
+          talleresAgrupadosPorDia: {},
+          talleresMasLlenos: [],
+          talleresConMenosInscritos: []
+        }
+      });
+    }
+    
+    // Total de inscritos (excluyendo encabezado)
+    const totalInscritos = rows.length - 1;
+    
+    // Contar inscritos POR TALLER
+    const inscritosPorTaller = {};
+    let personasConTalleres = 0;
+    let personasSinTalleres = 0;
+    
+    // Inicializar contadores para todos los talleres (debe coincidir con TALLERES_NOMBRES)
+    const nombresTalleres = {
+      'dia1-taller1': 'Resiliencia y esperanza',
+      'dia1-taller2': 'Amistad, enamoramiento y noviazgo',
+      'dia1-taller3': 'Identidad en la era digital',
+      'dia2-taller1': 'Finanzas inteligentes',
+      'dia2-taller2': 'Música y contenido',
+      'dia2-taller3': 'Verdad vs relativismo',
+      'dia3-taller1': 'Propósito y vocación',
+      'dia3-taller2': 'Misiones',
+      'dia3-taller3': 'Orientación vocacional y elección de carrera',
+      'dia4-taller1': 'Impacto comunitario',
+      'dia4-taller2': 'Comunicación y redes sociales',
+      'dia4-taller3': 'Proyecto de vida recargado'
+    };
+    
+    for (const [tallerId, nombreTaller] of Object.entries(nombresTalleres)) {
+      inscritosPorTaller[nombreTaller] = {
+        id: tallerId,
+        inscritos: 0,
+        cupoMaximo: 40,
+        disponibles: 40,
+        porcentajeOcupacion: '0.0'
+      };
+    }
+    
+    // Analizar datos demográficos y talleres
+    const distribucionGenero = { M: 0, F: 0 };
+    const distribucionEdad = { '13-15': 0, '16-18': 0, '19-21': 0, '22-25': 0, '26+': 0 };
+    const distribucionIglesia = {};
+    const distribucionPago = { Pagado: 0, Pendiente: 0 };
+    let totalTalleresAsignados = 0;
+    
+    // Contar inscritos (saltar encabezados)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      
+      // Columnas N-U (índices 13-20): talleres seleccionados
+      const talleres = row.slice(13, 21);
+      const tieneTalleres = talleres.some(t => t && t.trim() !== '');
+      
+      if (tieneTalleres) {
+        personasConTalleres++;
+      } else {
+        personasSinTalleres++;
+      }
+      
+      // Contar cada taller
+      talleres.forEach(nombreTaller => {
+        if (nombreTaller && nombreTaller.trim() !== '') {
+          const tallerNombre = nombreTaller.trim();
+          if (inscritosPorTaller[tallerNombre]) {
+            inscritosPorTaller[tallerNombre].inscritos++;
+          }
+        }
+      });
+      
+      // DEMOGRAFÍA - Género (columna E, índice 4)
+      const sexo = (row[4] || '').toUpperCase().trim();
+      if (sexo === 'M') distribucionGenero.M++;
+      else if (sexo === 'F') distribucionGenero.F++;
+      
+      // Edad (columna D, índice 3)
+      const edad = parseInt(row[3]) || 0;
+      if (edad >= 13 && edad <= 15) distribucionEdad['13-15']++;
+      else if (edad >= 16 && edad <= 18) distribucionEdad['16-18']++;
+      else if (edad >= 19 && edad <= 21) distribucionEdad['19-21']++;
+      else if (edad >= 22 && edad <= 25) distribucionEdad['22-25']++;
+      else if (edad >= 26) distribucionEdad['26+']++;
+      
+      // Iglesia (columna I, índice 8)
+      const iglesia = row[8] || 'No especificada';
+      distribucionIglesia[iglesia] = (distribucionIglesia[iglesia] || 0) + 1;
+      
+      // Estado de pago (columna K, índice 10)
+      const estadoPago = (row[10] || 'Pendiente').trim();
+      if (estadoPago === 'Confirmado' || estadoPago === 'Pagado') distribucionPago.Pagado++;
+      else distribucionPago.Pendiente++;
+      
+      // Contar talleres asignados
+      totalTalleresAsignados += talleres.filter(t => t && t.trim() !== '').length;
+    }
+    
+    // Calcular disponibles y porcentajes
+    for (const taller in inscritosPorTaller) {
+      const inscritos = inscritosPorTaller[taller].inscritos;
+      const cupoMaximo = inscritosPorTaller[taller].cupoMaximo;
+      
+      inscritosPorTaller[taller].disponibles = Math.max(0, cupoMaximo - inscritos);
+      inscritosPorTaller[taller].porcentajeOcupacion = ((inscritos / cupoMaximo) * 100).toFixed(1);
+      inscritosPorTaller[taller].excedeCapacidad = inscritos > cupoMaximo;
+      
+      if (inscritos > cupoMaximo) {
+        inscritosPorTaller[taller].exceso = inscritos - cupoMaximo;
+      }
+    }
+    
+    // Agrupar por día - TODOS los talleres, incluso con 0 inscritos
+    const talleresAgrupadosPorDia = {
+      dia1: {},
+      dia2: {},
+      dia3: {},
+      dia4: {}
+    };
+    
+    // Agregar TODOS los talleres a su día correspondiente
+    for (const [nombre, data] of Object.entries(inscritosPorTaller)) {
+      const match = data.id.match(/dia(\d)/);
+      if (match) {
+        const dia = match[1];
+        talleresAgrupadosPorDia[`dia${dia}`][nombre] = data;
+      }
+    }
+    
+    const promedioTalleresPorPersona = personasConTalleres > 0 
+      ? (totalTalleresAsignados / personasConTalleres).toFixed(1) 
+      : 0;
+    
+    const estadisticas = {
+      resumen: {
+        totalInscritos,
+        personasConTalleres,
+        personasSinTalleres,
+        porcentajeConTalleres: ((personasConTalleres / totalInscritos) * 100).toFixed(1),
+        cupoMaximoPorTaller: 40,
+        promedioTalleresPorPersona,
+        totalTalleresAsignados
+      },
+      demografia: {
+        genero: distribucionGenero,
+        edad: distribucionEdad,
+        iglesias: Object.entries(distribucionIglesia)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([nombre, cantidad]) => ({ nombre, cantidad })),
+        pago: distribucionPago
+      },
+      talleresDetallado: inscritosPorTaller,
+      talleresAgrupadosPorDia,
+      talleresMasLlenos: Object.entries(inscritosPorTaller)
+        .sort((a, b) => b[1].inscritos - a[1].inscritos)
+        .slice(0, 5)
+        .map(([nombre, data]) => ({ nombre, ...data })),
+      talleresConMenosInscritos: Object.entries(inscritosPorTaller)
+        .sort((a, b) => a[1].inscritos - b[1].inscritos)
+        .slice(0, 5)
+        .map(([nombre, data]) => ({ nombre, ...data })),
+      talleresExcedidos: Object.entries(inscritosPorTaller)
+        .filter(([, data]) => data.excedeCapacidad)
+        .map(([nombre, data]) => ({ nombre, ...data }))
+    };
+    
+    console.log('✅ Estadísticas generadas:');
+    console.log(`   Total inscritos: ${totalInscritos}`);
+    console.log(`   Con talleres: ${personasConTalleres} (${estadisticas.resumen.porcentajeConTalleres}%)`);
+    console.log(`   Sin talleres: ${personasSinTalleres}`);
+    console.log(`   Talleres excedidos: ${estadisticas.talleresExcedidos.length}`);
+    
+    res.json({ success: true, estadisticas });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Manejo de errores del servidor

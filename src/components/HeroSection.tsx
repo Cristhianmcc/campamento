@@ -58,11 +58,11 @@ export function HeroSection({ onIrATalleres, onVerMiPerfil }: HeroSectionProps) 
 
           {/* Información clave */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center items-center pt-2 sm:pt-4">
-            <div className="flex items-center gap-2 bg-[#2563EB]/30 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-[#C2A36B]/40 w-full sm:w-auto">
+            <div className="flex items-center justify-center gap-2 bg-[#2563EB]/30 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-[#C2A36B]/40 w-full sm:w-auto">
               <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#E0B84C] flex-shrink-0" />
               <span className="text-sm sm:text-base font-['Inter']">{campamentoConfig.fechas}</span>
             </div>
-            <div className="flex items-center gap-2 bg-[#2563EB]/30 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-[#C2A36B]/40 w-full sm:w-auto">
+            <div className="flex items-center justify-center gap-2 bg-[#2563EB]/30 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-[#C2A36B]/40 w-full sm:w-auto">
               <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-[#E0B84C] flex-shrink-0" />
               <span className="text-sm sm:text-base truncate font-['Inter']">{campamentoConfig.lugar}</span>
             </div>
