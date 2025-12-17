@@ -109,17 +109,39 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
       }
     }
 
-    // Desktop o fallback: Abrir WhatsApp Web solo con texto
+    // Desktop o fallback: Abrir WhatsApp con el formato apropiado
     const mensajeEncoded = encodeURIComponent(mensaje);
-    const urlWhatsApp = `https://wa.me/${campamentoConfig.contacto.whatsapp}?text=${mensajeEncoded}`;
     
-    toast.info("Abriendo WhatsApp Web", {
-      description: "Recuerda adjuntar manualmente la captura de pago",
-      duration: 6000,
-    });
+    // Para móviles: usar whatsapp://send (abre directamente la app sin mostrar opciones)
+    // Para desktop: usar https://wa.me/ (abre WhatsApp Web)
+    let urlWhatsApp: string;
+    
+    if (isMobile) {
+      // Formato para móviles - abre directamente la app
+      urlWhatsApp = `whatsapp://send?phone=${campamentoConfig.contacto.whatsapp}&text=${mensajeEncoded}`;
+      
+      toast.info("Abriendo WhatsApp", {
+        description: "Recuerda adjuntar manualmente la captura de pago",
+        duration: 6000,
+      });
+    } else {
+      // Formato para desktop - abre WhatsApp Web
+      urlWhatsApp = `https://wa.me/${campamentoConfig.contacto.whatsapp}?text=${mensajeEncoded}`;
+      
+      toast.info("Abriendo WhatsApp Web", {
+        description: "Recuerda adjuntar manualmente la captura de pago",
+        duration: 6000,
+      });
+    }
     
     setTimeout(() => {
-      window.open(urlWhatsApp, '_blank');
+      // En móviles, usar window.location.href en lugar de window.open para mejor compatibilidad
+      if (isMobile) {
+        window.location.href = urlWhatsApp;
+      } else {
+        window.open(urlWhatsApp, '_blank');
+      }
+      
       setTimeout(() => {
         onClose();
         setPaymentConfirmed(false);
