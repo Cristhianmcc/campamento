@@ -74,42 +74,7 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
     // Detectar si es móvil
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // En móvil: Intentar usar Share API para adjuntar la imagen
-    if (isMobile && navigator.share && navigator.canShare) {
-      try {
-        const shareData = {
-          files: capturaFile ? [capturaFile] : [],
-          text: mensaje,
-        };
-
-        // Verificar si se puede compartir archivos
-        if (capturaFile && navigator.canShare(shareData)) {
-          await navigator.share(shareData);
-          
-          toast.success("Comprobante compartido", {
-            description: "Selecciona WhatsApp para enviar el mensaje",
-            duration: 5000,
-          });
-          
-          setTimeout(() => {
-            onClose();
-            setPaymentConfirmed(false);
-            handleRemoveFile();
-          }, 1500);
-          return;
-        }
-      } catch (error: any) {
-        // Si el usuario cancela el share, resetear estado
-        if (error.name === 'AbortError') {
-          setPaymentConfirmed(false);
-          return;
-        }
-        console.warn('Error al compartir:', error);
-        // Continuar con el fallback de WhatsApp Web
-      }
-    }
-
-    // Desktop o fallback: Abrir WhatsApp con el formato apropiado
+    // Abrir WhatsApp directamente con el formato apropiado
     const mensajeEncoded = encodeURIComponent(mensaje);
     
     // Para móviles: usar whatsapp://send (abre directamente la app sin mostrar opciones)
