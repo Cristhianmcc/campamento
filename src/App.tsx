@@ -150,10 +150,6 @@ export default function App() {
     setDatosUsuario(null);
   };
 
-  const handleAbrirEstadisticas = () => {
-    setVistaActual("estadisticas");
-  };
-
   const handleVolverDesdeSeleccion = () => {
     setVistaActual("acceso-talleres");
   };

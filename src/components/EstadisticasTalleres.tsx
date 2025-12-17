@@ -39,8 +39,6 @@ interface Estadisticas {
   talleresExcedidos: Array<{ nombre: string } & EstadisticasTaller>;
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-
 export default function EstadisticasTalleres() {
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,11 +120,6 @@ export default function EstadisticasTalleres() {
     rango,
     cantidad
   })) : [];
-
-  const datosPago = estadisticas?.demografia ? [
-    { name: 'Pagado', value: estadisticas.demografia.pago.Pagado, color: '#10b981' },
-    { name: 'Pendiente', value: estadisticas.demografia.pago.Pendiente, color: '#f59e0b' }
-  ] : [];
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
