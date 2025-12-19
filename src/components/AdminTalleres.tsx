@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription } from "./ui/alert";
-import { Settings, Users, Save, TrendingUp, AlertCircle, CheckCircle, BarChart3, Loader2 } from "lucide-react";
+import { Settings, Users, Save, TrendingUp, AlertCircle, BarChart3, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { capacidadConfig } from "../config/campamento";
 
