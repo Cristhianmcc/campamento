@@ -7,18 +7,21 @@ import { TalleresAcceso } from "./components/TalleresAcceso";
 import { SeleccionTalleresPorDia } from "./components/SeleccionTalleresPorDia";
 import { MiPerfil } from "./components/MiPerfil";
 import EstadisticasTalleres from "./components/EstadisticasTalleres";
+import { AdminTalleres } from "./components/AdminTalleres";
 import { googleSheetsService } from "./services/googleSheets";
 import { InscripcionData } from "./config/campamento";
 import { Toaster, toast } from "sonner";
 import { Home, ArrowLeft } from "lucide-react";
 
-type Vista = "inicio" | "acceso-talleres" | "seleccion-taller" | "taller-registrado" | "mi-perfil" | "estadisticas";
+type Vista = "inicio" | "acceso-talleres" | "seleccion-taller" | "taller-registrado" | "mi-perfil" | "estadisticas" | "admin";
 
 export default function App() {
   const [vistaActual, setVistaActual] = useState<Vista>(() => {
     // Leer la ruta inicial desde el hash
     const hash = window.location.hash.replace('#/', '');
-    return (hash === 'estadisticas' ? 'estadisticas' : 'inicio') as Vista;
+    if (hash === 'estadisticas') return 'estadisticas';
+    if (hash === 'admin') return 'admin';
+    return 'inicio';
   });
   const [modalPagoOpen, setModalPagoOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -277,6 +280,19 @@ export default function App() {
             Volver
           </button>
           <EstadisticasTalleres />
+        </div>
+      )}
+
+      {vistaActual === "admin" && (
+        <div className="relative">
+          <button
+            onClick={handleVolverAInicio}
+            className="fixed top-4 left-4 z-50 bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-full shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-2 border border-gray-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Volver
+          </button>
+          <AdminTalleres onVerEstadisticas={() => setVistaActual("estadisticas")} />
         </div>
       )}
     </div>

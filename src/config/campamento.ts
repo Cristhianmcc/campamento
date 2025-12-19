@@ -1,5 +1,18 @@
 // Configuración del Campamento - Actualiza estos valores para cada nuevo campamento
 
+// Configuración de cupos
+const CAPACIDAD_TOTAL_CAMPAMENTO = 50;
+const TALLERES_POR_DIA = 3;
+const TALLERES_POR_PERSONA = 2;
+const CUPO_POR_TALLER = Math.ceil((CAPACIDAD_TOTAL_CAMPAMENTO * TALLERES_POR_PERSONA) / TALLERES_POR_DIA);
+
+export const capacidadConfig = {
+  capacidadTotal: CAPACIDAD_TOTAL_CAMPAMENTO,
+  talleresPorDia: TALLERES_POR_DIA,
+  talleresPorPersona: TALLERES_POR_PERSONA,
+  cupoPorTaller: CUPO_POR_TALLER
+};
+
 export const campamentoConfig = {
   // Información General
   nombre: "Campamento Juvenil ¡SI, SEÑOR!",
@@ -65,7 +78,7 @@ export const campamentoConfig = {
           numero: 1,
           nombre: "Resiliencia y esperanza",
           descripcion: "Objetivo: problema de la frustración y ansiedad",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -73,7 +86,7 @@ export const campamentoConfig = {
           numero: 2,
           nombre: "Amistad, enamoramiento y noviazgo",
           descripcion: "Objetivo: problemas en los tiempos de superficialidad",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -81,7 +94,7 @@ export const campamentoConfig = {
           numero: 3,
           nombre: "Identidad en la era digital",
           descripcion: "Objetivo: problemas con la presión social y cultural",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         }
       ]
@@ -95,7 +108,7 @@ export const campamentoConfig = {
           numero: 1,
           nombre: "Finanzas inteligentes",
           descripcion: "Objetivo: Ser un buen administrador. Educación financiera en la juventud",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -103,7 +116,7 @@ export const campamentoConfig = {
           numero: 2,
           nombre: "Música y contenido",
           descripcion: "Objetivo: Lo que consumo forma lo que soy",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -111,7 +124,7 @@ export const campamentoConfig = {
           numero: 3,
           nombre: "Verdad vs relativismo",
           descripcion: "Objetivo: mi verdad y la verdad del evangelio, dilema ético",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         }
       ]
@@ -125,7 +138,7 @@ export const campamentoConfig = {
           numero: 1,
           nombre: "Propósito y vocación",
           descripcion: "Objetivo: Dones y talentos conectados con la visión de Dios",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -133,7 +146,7 @@ export const campamentoConfig = {
           numero: 2,
           nombre: "Misiones",
           descripcion: "Objetivo: ayudar a los jóvenes a comprender qué significa misión en un sentido integral",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -141,7 +154,7 @@ export const campamentoConfig = {
           numero: 3,
           nombre: "Orientación vocacional y elección de carrera",
           descripcion: "Objetivo: ¿Cómo descubro mi llamado?",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         }
       ]
@@ -155,7 +168,7 @@ export const campamentoConfig = {
           numero: 1,
           nombre: "Impacto comunitario",
           descripcion: "Objetivo: Cómo ser sal y luz en mi barrio",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -163,7 +176,7 @@ export const campamentoConfig = {
           numero: 2,
           nombre: "Comunicación y redes sociales",
           descripcion: "Objetivo: Impacto digital",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         },
         {
@@ -171,7 +184,7 @@ export const campamentoConfig = {
           numero: 3,
           nombre: "Proyecto de vida recargado",
           descripcion: "Objetivo: Mi historia como carta abierta",
-          capacidadMaxima: 17,
+          capacidadMaxima: CUPO_POR_TALLER,
           inscritos: 0
         }
       ]

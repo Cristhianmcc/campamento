@@ -72,7 +72,7 @@ export function SeleccionTalleresPorDia({
       } else {
         // Verificar si el taller está lleno ANTES de agregar
         const inscritos = inscritosPorTaller[tallerId] || 0;
-        const capacidad = 17;
+        const capacidad = Math.ceil((50 * 2) / 3);
         
         if (inscritos >= capacidad) {
           toast.error('Este taller ya está lleno', {
