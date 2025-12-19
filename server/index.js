@@ -27,6 +27,12 @@ const TALLERES_NOMBRES = {
   'dia4-taller3': 'Proyecto de vida recargado'
 };
 
+// Configuración de cupos
+const CAPACIDAD_TOTAL_CAMPAMENTO = 50;
+const TALLERES_POR_DIA = 3;
+const TALLERES_POR_PERSONA = 2;
+const CUPO_POR_TALLER = Math.ceil((CAPACIDAD_TOTAL_CAMPAMENTO * TALLERES_POR_PERSONA) / TALLERES_POR_DIA);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -999,7 +1005,7 @@ app.get('/api/estadisticas-talleres', async (req, res) => {
             personasConTalleres: 0,
             personasSinTalleres: 0,
             porcentajeConTalleres: '0.0',
-            cupoMaximoPorTaller: 40
+            cupoMaximoPorTaller: CUPO_POR_TALLER
           },
           talleresDetallado: {},
           talleresAgrupadosPorDia: {},
@@ -1037,8 +1043,8 @@ app.get('/api/estadisticas-talleres', async (req, res) => {
       inscritosPorTaller[nombreTaller] = {
         id: tallerId,
         inscritos: 0,
-        cupoMaximo: 40,
-        disponibles: 40,
+        cupoMaximo: CUPO_POR_TALLER,
+        disponibles: CUPO_POR_TALLER,
         porcentajeOcupacion: '0.0'
       };
     }
@@ -1141,7 +1147,7 @@ app.get('/api/estadisticas-talleres', async (req, res) => {
         personasConTalleres,
         personasSinTalleres,
         porcentajeConTalleres: ((personasConTalleres / totalInscritos) * 100).toFixed(1),
-        cupoMaximoPorTaller: 40,
+        cupoMaximoPorTaller: CUPO_POR_TALLER,
         promedioTalleresPorPersona,
         totalTalleresAsignados
       },
