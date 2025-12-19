@@ -138,6 +138,8 @@ export default function App() {
       const hash = window.location.hash.replace('#/', '');
       if (hash === 'estadisticas') {
         setVistaActual('estadisticas');
+      } else if (hash === 'admin') {
+        setVistaActual('admin');
       } else if (hash === '' && vistaActual !== 'inicio') {
         setVistaActual('inicio');
       }
