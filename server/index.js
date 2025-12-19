@@ -928,6 +928,7 @@ const server = app.listen(PORT, () => {
   console.log(`📊 Conectado a Google Sheets: ${SPREADSHEET_ID}`);
   console.log('');
   console.log('Endpoints disponibles:');
+  console.log(`  GET    http://localhost:${PORT}/health`);
   console.log(`  POST   http://localhost:${PORT}/api/inscripciones`);
   console.log(`  GET    http://localhost:${PORT}/api/verificar-dni/:dni`);
   console.log(`  GET    http://localhost:${PORT}/api/verificar-pago/:dni`);
@@ -942,10 +943,44 @@ const server = app.listen(PORT, () => {
   console.log('⏳ Esperando peticiones...');
 });
 
-// 8. Obtener estadísticas completas de talleres
+// ==========================================
+// KEEP ALIVE - Health Check para UptimeRobot
+// ==========================================
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    message: 'Backend funcionando correctamente'
+  });
+});
+
+// ==========================================
+// SISTEMA DE CACHÉ PARA ESTADÍSTICAS
+// ==========================================
+
+let cacheEstadisticas = null;
+let ultimaActualizacion = null;
+const CACHE_DURACION = 2 * 60 * 1000; // 2 minutos
+
+// 8. Obtener estadísticas completas de talleres (CON CACHÉ)
 app.get('/api/estadisticas-talleres', async (req, res) => {
   try {
-    console.log('📊 Generando estadísticas de talleres...');
+    const ahora = Date.now();
+    
+    // Si el caché es válido, devolverlo inmediatamente
+    if (cacheEstadisticas && ultimaActualizacion && (ahora - ultimaActualizacion < CACHE_DURACION)) {
+      console.log('📊 Devolviendo estadísticas desde caché');
+      return res.json({ 
+        success: true, 
+        estadisticas: cacheEstadisticas,
+        fromCache: true,
+        cacheAge: Math.floor((ahora - ultimaActualizacion) / 1000) + 's'
+      });
+    }
+
+    console.log('📊 Generando estadísticas frescas...');
     
     // Obtener todas las inscripciones
     const result = await sheets.spreadsheets.values.get({
@@ -1134,13 +1169,17 @@ app.get('/api/estadisticas-talleres', async (req, res) => {
         .map(([nombre, data]) => ({ nombre, ...data }))
     };
     
-    console.log('✅ Estadísticas generadas:');
+    // Guardar en caché
+    cacheEstadisticas = estadisticas;
+    ultimaActualizacion = Date.now();
+    
+    console.log('✅ Estadísticas generadas y guardadas en caché:');
     console.log(`   Total inscritos: ${totalInscritos}`);
     console.log(`   Con talleres: ${personasConTalleres} (${estadisticas.resumen.porcentajeConTalleres}%)`);
     console.log(`   Sin talleres: ${personasSinTalleres}`);
     console.log(`   Talleres excedidos: ${estadisticas.talleresExcedidos.length}`);
     
-    res.json({ success: true, estadisticas });
+    res.json({ success: true, estadisticas, fromCache: false });
   } catch (error) {
     console.error('Error al obtener estadísticas:', error);
     res.status(500).json({ success: false, error: error.message });

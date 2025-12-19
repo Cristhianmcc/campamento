@@ -48,7 +48,8 @@ export default function EstadisticasTalleres() {
   const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const API_URL = isLocalDevelopment 
     ? 'http://localhost:3002/api' 
-    : 'https://screeching-marcie-laroca-b9daacc1.koyeb.app/api';
+    // : 'https://screeching-marcie-laroca-b9daacc1.koyeb.app/api'; // Koyeb (no gratuito)
+    : 'https://campamento-nz0r.onrender.com/api'; // Render (gratuito)
 
   useEffect(() => {
     cargarEstadisticas();
