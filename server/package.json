@@ -8,12 +8,20 @@
     "start": "node index.js",
     "dev": "node index.js"
   },
-  "keywords": ["api", "google-sheets", "campamento"],
+  "keywords": [
+    "api",
+    "google-sheets",
+    "campamento"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
     "cors": "^2.8.5",
-    "googleapis": "^144.0.0"
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "react-joyride": "^2.9.3"
+  },
+  "devDependencies": {
+    "@types/react-joyride": "^2.0.2"
   }
 }

@@ -950,6 +950,57 @@ const server = app.listen(PORT, () => {
 });
 
 // ==========================================
+// PANEL DE ADMINISTRACIÓN
+// ==========================================
+
+app.post('/api/admin/actualizar-capacidad', async (req, res) => {
+  try {
+    const { nuevaCapacidad } = req.body;
+    
+    if (!nuevaCapacidad || nuevaCapacidad < 20 || nuevaCapacidad > 200) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Capacidad inválida. Debe estar entre 20 y 200.' 
+      });
+    }
+
+    const capacidadNum = parseInt(nuevaCapacidad);
+    
+    // 1. Actualizar server/index.js
+    const serverPath = path.join(__dirname, 'index.js');
+    let serverContent = fs.readFileSync(serverPath, 'utf8');
+    serverContent = serverContent.replace(
+      /const CAPACIDAD_TOTAL_CAMPAMENTO = \d+;/,
+      `const CAPACIDAD_TOTAL_CAMPAMENTO = ${capacidadNum};`
+    );
+    fs.writeFileSync(serverPath, serverContent, 'utf8');
+
+    // 2. Actualizar src/config/campamento.ts
+    const configPath = path.join(__dirname, '..', 'src', 'config', 'campamento.ts');
+    let configContent = fs.readFileSync(configPath, 'utf8');
+    configContent = configContent.replace(
+      /const CAPACIDAD_TOTAL_CAMPAMENTO = \d+;/,
+      `const CAPACIDAD_TOTAL_CAMPAMENTO = ${capacidadNum};`
+    );
+    fs.writeFileSync(configPath, configContent, 'utf8');
+
+    const nuevoCupo = Math.ceil((capacidadNum * 2) / 3);
+
+    console.log(`✅ Capacidad actualizada: ${capacidadNum} personas (${nuevoCupo} cupos por taller)`);
+
+    res.json({ 
+      success: true, 
+      mensaje: 'Capacidad actualizada correctamente',
+      nuevaCapacidad: capacidadNum,
+      nuevoCupoPorTaller: nuevoCupo
+    });
+  } catch (error) {
+    console.error('❌ Error al actualizar capacidad:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ==========================================
 // KEEP ALIVE - Health Check para UptimeRobot
 // ==========================================
 
