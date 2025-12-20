@@ -100,7 +100,7 @@ try {
 
 // Obtener spreadsheetId del archivo .env o configuración
 const SPREADSHEET_ID = process.env.VITE_SPREADSHEET_ID || '1hCbcC82oeY4auvQ6TC4FdmWcfr35Cnw-EJcPg8B8MCg';
-const SPREADSHEET_ID_BACKUP = process.env.VITE_SPREADSHEET_ID_BACKUP || '1Zl1VCEj6igMxlMRMElu2P-jDyx1ChCXLNRlkpd75HxI'; // Sheet de respaldo
+const SPREADSHEET_ID_BACKUP = process.env.VITE_SPREADSHEET_ID_BACKUP || '1Xp8VI8CulkMZMiOc1RzopFLrwL6FnTQ5a3_gskMpbcY'; // Sheet de respaldo
 
 // ==================== ENDPOINTS ====================
 

@@ -156,21 +156,24 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
               <p className="text-xs sm:text-sm mt-2 font-['Inter']" style={{ color: '#1F2933' }}>{campamentoConfig.precioDescripcion}</p>
             </div>
 
-            {/* Tabs para YAPE y PLIN */}
-            <Tabs defaultValue="yape" className="w-full">
+            {/* Tabs para PLIN y Transferencia Bancaria */}
+            <Tabs defaultValue="plin" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="yape" className="text-lg">
-                  YAPE
-                </TabsTrigger>
                 <TabsTrigger value="plin" className="text-lg">
                   PLIN
                 </TabsTrigger>
+                <TabsTrigger value="banco" className="text-lg">
+                  Transferencia
+                </TabsTrigger>
+                {/* <TabsTrigger value="yape" className="text-lg">
+                  YAPE
+                </TabsTrigger> */}
               </TabsList>
 
-              {/* YAPE Tab */}
+              {/* YAPE Tab - Comentado temporalmente
               <TabsContent value="yape" className="space-y-4 mt-6">
                 <div className="flex flex-col items-center">
-                  {/* QR Code */}
+                  QR Code
                   <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg border-4 border-purple-500">
                     <ImageWithFallback
                       src={campamentoConfig.imagenQRYape}
@@ -179,7 +182,7 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
                     />
                   </div>
 
-                  {/* Información del número */}
+                  Información del número
                   <div className="mt-4 sm:mt-6 w-full bg-purple-50 p-3 sm:p-4 rounded-lg border border-purple-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-2">Número de YAPE:</p>
                     <div className="flex items-center justify-between">
@@ -199,7 +202,7 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
                     </p>
                   </div>
                 </div>
-              </TabsContent>
+              </TabsContent> */}
 
               {/* PLIN Tab */}
               <TabsContent value="plin" className="space-y-4 mt-6">
@@ -231,6 +234,68 @@ export function ModalPago({ isOpen, onClose, inscripcionData }: ModalPagoProps) 
                     <p className="text-xs sm:text-sm text-gray-600 mt-2">
                       A nombre de: <span className="text-gray-800">{campamentoConfig.plinTitular}</span>
                     </p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Transferencia Bancaria Tab */}
+              <TabsContent value="banco" className="space-y-4 mt-6">
+                <div className="flex flex-col items-center">
+                  {/* Imagen de Cuenta Bancaria */}
+                  <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg border-4 border-green-500 mb-4">
+                    <ImageWithFallback
+                      src={campamentoConfig.imagenCuentaBancaria}
+                      alt="Datos Bancarios"
+                      className="w-full max-w-md h-auto object-contain"
+                    />
+                  </div>
+
+                  {/* Información Bancaria */}
+                  <div className="w-full space-y-4">
+                    {/* Número de Cuenta */}
+                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2">Número de Cuenta - Scotiabank:</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg sm:text-xl text-green-700 font-semibold">
+                          {campamentoConfig.cuentaBancaria}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(campamentoConfig.cuentaBancaria, "Cuenta")}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* CCI */}
+                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2">CCI:</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg sm:text-xl text-green-700 font-semibold">
+                          {campamentoConfig.cci}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(campamentoConfig.cci, "CCI")}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Titular */}
+                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2">Banco:</p>
+                      <p className="text-base sm:text-lg text-gray-800 font-medium">
+                        {campamentoConfig.banco}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-2">
+                        A nombre de: <span className="text-gray-800 font-semibold">{campamentoConfig.titularCuenta}</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </TabsContent>

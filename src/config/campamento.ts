@@ -25,15 +25,22 @@ export const campamentoConfig = {
   precioDescripcion: "Incluye alojamiento, alimentación completa y materiales",
   
   // Información de Pago
-  yapeNumero: "+51 955 195 324",
-  yapeTitular: "Iglesia La Roca",
-  plinNumero: "+51 955 195 324",
-  plinTitular: "Iglesia La Roca",
+  yapeNumero: "+51 998 337 031",
+  yapeTitular: "Anibal Carazas",
+  plinNumero: "+51 998 337 031",
+  plinTitular: "Anibal Carazas",
+  
+  // Información Bancaria
+  cuentaBancaria: "107-7164760",
+  banco: "Scotiabank",
+  cci: "009-266-201077164760-86",
+  titularCuenta: "Anibal Carazas",
   
   // URL de imágenes (puedes cambiar estas URLs)
   imagenHero: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1600&q=80", // Imagen de banner principal
   imagenQRYape: "/qr.jpeg", // QR de YAPE (en carpeta public)
-  imagenQRPlin: "https://images.unsplash.com/photo-1609356767591-002b28e37b09?w=400&q=80", // Reemplazar con QR real de PLIN
+  imagenQRPlin: "/plin.jpeg", // QR de PLIN (en carpeta public)
+  imagenCuentaBancaria: "/cuenta.jpeg", // Imagen de datos bancarios (en carpeta public)
   
   // Google Sheets - Configuración para almacenar inscripciones
   googleSheets: {
@@ -46,8 +53,8 @@ export const campamentoConfig = {
   // Información de Contacto
   contacto: {
     email: "campamento@iglesialaroca.org",
-    telefono: "+51 955 195 324",
-    whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51955195324", // Solo números, sin + ni espacios
+    telefono: "+51 998 337 031",
+    whatsapp: (import.meta as any).env?.VITE_WHATSAPP_NUMBER || "51998337031", // Solo números, sin + ni espacios
     direccion: "Av. Las Palmas, Lima, Perú",
   },
   

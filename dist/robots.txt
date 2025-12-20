@@ -1,0 +1,13 @@
+# Permitir a todos los robots rastrear el sitio
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://campamento2026.netlify.app/sitemap.xml
+
+# Optimización para motores de búsqueda específicos
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
